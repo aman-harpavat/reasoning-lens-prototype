@@ -10,6 +10,8 @@ function App() {
   const [hasPromptLoaded, setHasPromptLoaded] = useState(false);
   const [hasGeneratedOutput, setHasGeneratedOutput] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLensOpen, setIsLensOpen] = useState(false);
+  const [expandedLensCards, setExpandedLensCards] = useState([]);
 
   const activeFlow = selectedFlow ? flows[selectedFlow] : null;
 
@@ -41,6 +43,8 @@ function App() {
     setIsDemoPickerOpen(false);
     setHasGeneratedOutput(false);
     setIsGenerating(false);
+    setIsLensOpen(false);
+    setExpandedLensCards([]);
   };
 
   const handleSendPrompt = () => {
@@ -50,6 +54,18 @@ function App() {
 
     setIsGenerating(true);
     setIsDemoPickerOpen(false);
+    setIsLensOpen(false);
+  };
+
+  const handleOpenLens = () => {
+    setIsLensOpen(true);
+    setExpandedLensCards((current) =>
+      current.length ? current : ["assumptions"]
+    );
+  };
+
+  const handleCloseLens = () => {
+    setIsLensOpen(false);
   };
 
   return (
@@ -68,6 +84,10 @@ function App() {
           <ChatSimulation
             activeFlow={activeFlow}
             isGenerating={isGenerating}
+            isLensOpen={isLensOpen}
+            expandedLensCards={expandedLensCards}
+            onOpenLens={handleOpenLens}
+            onCloseLens={handleCloseLens}
             onComposerClick={handleOpenDemoPicker}
             onSendPrompt={handleSendPrompt}
           />

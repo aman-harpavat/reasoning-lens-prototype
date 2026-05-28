@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import PostResponseActions from "./PostResponseActions";
 
-function MessageThread({ activeFlow, isGenerating }) {
+function MessageThread({ activeFlow, isGenerating, isLensOpen, onOpenLens }) {
   const paragraphWords = useMemo(
     () => activeFlow.initialOutput.map((paragraph) => paragraph.split(" ")),
     [activeFlow]
@@ -63,11 +64,20 @@ function MessageThread({ activeFlow, isGenerating }) {
                 <span className="message-thinking-text">Thinking...</span>
               </div>
             ) : (
-              <div className="message-copy">
-                {visibleParagraphs.map((paragraph, index) => (
-                  <p key={`${index}-${activeFlow.title}`}>{paragraph}</p>
-                ))}
-              </div>
+              <>
+                <div className="message-copy">
+                  {visibleParagraphs.map((paragraph, index) => (
+                    <p key={`${index}-${activeFlow.title}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                {visibleWordCount >= totalWords ? (
+                  <PostResponseActions
+                    isLensOpen={isLensOpen}
+                    onOpenLens={onOpenLens}
+                  />
+                ) : null}
+              </>
             )}
           </div>
         </div>
