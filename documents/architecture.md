@@ -28,7 +28,7 @@ The user opens `Review with Reasoning Lens`. The right-side panel shows exactly 
 2. `What to be careful about`
 3. `What’s missing`
 
-All three are expanded by default. Cards remain collapsible. Cards contain only:
+All three remain open. They are no longer collapsible. The panel should reveal the cards progressively so the inspection layer feels like Claude is surfacing the analysis step by step. Cards contain only:
 
 - title
 - severity
@@ -141,6 +141,8 @@ Default:
 ```js
 ["assumptions", "careful", "missing"]
 ```
+
+This is now effectively a fixed default-open set rather than an actively user-managed collapse state.
 
 ### `isContextFlowActive`
 
@@ -272,6 +274,7 @@ Final polish and build verification.
   - `What to be careful about`
   - `What’s missing`
 - All 3 cards are expanded by default
+- Cards stay open and are not collapsible
 - First two cards do not show buttons
 - Only `What’s missing` shows `Add more context`
 - Clicking `Add more context` starts follow-up questions

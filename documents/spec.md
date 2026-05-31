@@ -75,9 +75,9 @@ When the user clicks `Review with Reasoning Lens`, open the side panel and show 
 2. `What to be careful about`
 3. `What’s missing`
 
-All 3 cards must be expanded by default.
+All 3 cards must remain open. They should not be collapsible.
 
-Cards remain collapsible.
+The inspection layer should feel generated rather than dumped onto the screen, so the cards should reveal progressively after the panel opens.
 
 Cards must contain only:
 
@@ -334,17 +334,18 @@ Behavior:
    - What to be careful about
    - What’s missing
 3. All 3 cards are expanded by default.
-4. First two cards do not show buttons.
-5. Only What’s missing shows Add more context.
-6. Clicking Add more context starts follow-up questions.
-7. Interview flow asks the updated payment-processing/Data PM questions.
-8. Research flow asks the updated workplace team/evaluation behavior questions.
-9. What Changed block/card is removed.
-10. Final reflection prompts are removed.
-11. Final improved answer appears only after context questions are answered.
-12. Final improved answer is polished and complete.
-13. UI still matches Claude visual design.
-14. `npm run build` passes.
+4. Cards are always open and not collapsible.
+5. First two cards do not show buttons.
+6. Only What’s missing shows Add more context.
+7. Clicking Add more context starts follow-up questions.
+8. Interview flow asks the updated payment-processing/Data PM questions.
+9. Research flow asks the updated workplace team/evaluation behavior questions.
+10. What Changed block/card is removed.
+11. Final reflection prompts are removed.
+12. Final improved answer appears only after context questions are answered.
+13. Final improved answer is polished and complete.
+14. UI still matches Claude visual design.
+15. `npm run build` passes.
 
 ## 8. Implementation Notes
 

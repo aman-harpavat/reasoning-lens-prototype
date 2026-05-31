@@ -11,11 +11,6 @@ function App() {
   const [hasGeneratedOutput, setHasGeneratedOutput] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLensOpen, setIsLensOpen] = useState(false);
-  const [expandedLensCards, setExpandedLensCards] = useState([
-    "assumptions",
-    "careful",
-    "missing"
-  ]);
   const [isContextFlowActive, setIsContextFlowActive] = useState(false);
   const [currentContextQuestionIndex, setCurrentContextQuestionIndex] = useState(0);
   const [answeredContextQuestions, setAnsweredContextQuestions] = useState([]);
@@ -79,7 +74,6 @@ function App() {
 
   const resetReviewState = () => {
     setIsLensOpen(false);
-    setExpandedLensCards(["assumptions", "careful", "missing"]);
     setIsContextFlowActive(false);
     setCurrentContextQuestionIndex(0);
     setAnsweredContextQuestions([]);
@@ -115,21 +109,10 @@ function App() {
 
   const handleOpenLens = () => {
     setIsLensOpen(true);
-    setExpandedLensCards((current) =>
-      current.length ? current : ["assumptions", "careful", "missing"]
-    );
   };
 
   const handleCloseLens = () => {
     setIsLensOpen(false);
-  };
-
-  const handleToggleLensCard = (cardId) => {
-    setExpandedLensCards((current) =>
-      current.includes(cardId)
-        ? current.filter((id) => id !== cardId)
-        : [...current, cardId]
-    );
   };
 
   const handleStartContextFlow = () => {
@@ -196,7 +179,6 @@ function App() {
             activeFlow={activeFlow}
             isGenerating={isGenerating}
             isLensOpen={isLensOpen}
-            expandedLensCards={expandedLensCards}
             isContextFlowActive={isContextFlowActive}
             currentContextQuestionIndex={currentContextQuestionIndex}
             answeredContextQuestions={answeredContextQuestions}
@@ -205,7 +187,6 @@ function App() {
             finalOutput={finalOutput}
             onOpenLens={handleOpenLens}
             onCloseLens={handleCloseLens}
-            onToggleLensCard={handleToggleLensCard}
             onStartContextFlow={handleStartContextFlow}
             onSendContextResponse={handleSendContextResponse}
             onComposerClick={handleOpenDemoPicker}

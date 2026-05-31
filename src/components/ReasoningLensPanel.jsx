@@ -1,13 +1,36 @@
+import { useEffect, useState } from "react";
 import LensModuleCard from "./LensModuleCard";
 
 function ReasoningLensPanel({
   activeFlow,
-  expandedLensCards,
   isContextFlowActive,
   onCloseLens,
-  onToggleLensCard,
   onStartContextFlow
 }) {
+  const [visibleCardCount, setVisibleCardCount] = useState(0);
+
+  useEffect(() => {
+    setVisibleCardCount(0);
+
+    const firstTimer = window.setTimeout(() => {
+      setVisibleCardCount(1);
+    }, 500);
+
+    const secondTimer = window.setTimeout(() => {
+      setVisibleCardCount(2);
+    }, 900);
+
+    const thirdTimer = window.setTimeout(() => {
+      setVisibleCardCount(3);
+    }, 1300);
+
+    return () => {
+      window.clearTimeout(firstTimer);
+      window.clearTimeout(secondTimer);
+      window.clearTimeout(thirdTimer);
+    };
+  }, [activeFlow]);
+
   const getSeverityTone = (severity) => {
     if (severity.startsWith("High")) return "is-high";
     if (severity.startsWith("Medium")) return "is-medium";
@@ -32,23 +55,24 @@ function ReasoningLensPanel({
         relying on it.
       </p>
 
-      <div className="lens-panel-modules">
-        {activeFlow.lensCards.map((card) => {
-          const isExpanded = expandedLensCards.includes(card.id);
+      {visibleCardCount === 0 ? (
+        <div className="lens-panel-thinking" aria-live="polite">
+          <span className="message-thinking-text">Thinking...</span>
+        </div>
+      ) : null}
 
-          return (
-            <LensModuleCard
-              key={card.id}
-              card={card}
-              expanded={isExpanded}
-              severityTone={getSeverityTone(card.severity)}
-              showContextCta={card.id === "missing"}
-              isContextFlowActive={isContextFlowActive}
-              onStartContextFlow={onStartContextFlow}
-              onToggle={() => onToggleLensCard(card.id)}
-            />
-          );
-        })}
+      <div className="lens-panel-modules">
+        {activeFlow.lensCards.slice(0, visibleCardCount).map((card, index) => (
+          <LensModuleCard
+            key={card.id}
+            card={card}
+            severityTone={getSeverityTone(card.severity)}
+            showContextCta={card.id === "missing"}
+            isContextFlowActive={isContextFlowActive}
+            onStartContextFlow={onStartContextFlow}
+            revealDelay={index * 180}
+          />
+        ))}
       </div>
     </aside>
   );

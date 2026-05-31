@@ -7,7 +7,6 @@ function ChatSimulation({
   activeFlow,
   isGenerating,
   isLensOpen,
-  expandedLensCards,
   isContextFlowActive,
   currentContextQuestionIndex,
   answeredContextQuestions,
@@ -16,7 +15,6 @@ function ChatSimulation({
   finalOutput,
   onOpenLens,
   onCloseLens,
-  onToggleLensCard,
   onStartContextFlow,
   onSendContextResponse,
   onComposerClick,
@@ -62,10 +60,8 @@ function ChatSimulation({
         {isLensOpen ? (
           <ReasoningLensPanel
             activeFlow={activeFlow}
-            expandedLensCards={expandedLensCards}
             isContextFlowActive={isContextFlowActive}
             onCloseLens={onCloseLens}
-            onToggleLensCard={onToggleLensCard}
             onStartContextFlow={onStartContextFlow}
           />
         ) : null}

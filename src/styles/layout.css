@@ -291,6 +291,7 @@
   align-items: stretch;
   justify-content: space-between;
   padding-top: 32px;
+  min-height: 0;
 }
 
 .workspace-placeholder {
@@ -327,11 +328,12 @@
 }
 
 .chat-layout {
-  width: min(100%, 980px);
+  width: min(100%, 1020px);
   margin: 0 auto;
   flex: 1;
   display: flex;
   gap: 24px;
+  min-height: 0;
 }
 
 .chat-layout.is-lens-open {
@@ -342,19 +344,22 @@
 .message-thread {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 0;
 }
 
 .chat-layout.is-lens-open .message-thread {
-  flex: 1 1 0;
+  flex: 0 1 calc(100% - 444px);
 }
 
 .message-thread-inner {
-  width: min(100%, 760px);
+  width: 100%;
+  max-width: 1020px;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   padding-top: 48px;
+  padding-bottom: 220px;
 }
 
 .message-row {
@@ -643,10 +648,31 @@
 
 .composer-shell {
   width: min(100%, 1020px);
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  margin: 0 auto;
+  padding-top: var(--space-2);
+  background: linear-gradient(
+    to top,
+    rgba(27, 27, 26, 0.98) 0%,
+    rgba(27, 27, 26, 0.94) 55%,
+    rgba(27, 27, 26, 0) 100%
+  );
+}
+
+.chat-layout.is-lens-open + .composer-shell {
+  width: min(100%, 1260px);
 }
 
 .composer-anchor {
   position: relative;
+  width: 100%;
+}
+
+.chat-layout.is-lens-open + .composer-shell .composer-anchor {
+  width: calc(100% - 444px);
+  margin-right: auto;
 }
 
 .composer-flow-chip {
