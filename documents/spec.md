@@ -1,207 +1,215 @@
 # Reasoning Lens Prototype Specification
 
-## 0. Purpose Of This Document
+## 0. Purpose
 
-This document defines the build spec for a high-fidelity web prototype of **Reasoning Lens**, a proposed native Claude feature.
+This is the build spec for a high-fidelity Claude-native prototype of **Reasoning Lens**.
 
-The prototype remains a **controlled, hardcoded, interactive product simulation**. It must not use a real Claude API, backend, database, authentication, or freeform generation. The purpose is to demonstrate the product experience clearly and reliably for a graduation project submission.
+The prototype remains:
 
-## 1. Problem Statement
+- hardcoded
+- interactive
+- frontend-only
+- Vercel-compatible
 
-AI outputs can look polished and confident even when they rely on weak reasoning, hidden assumptions, missing context, or unsupported claims. Early-career knowledge workers often judge these outputs through fluency and confidence rather than actual reasoning quality.
+Do not add live AI, backend, API calls, auth, database, or freeform generation.
 
-Reasoning Lens should help users inspect AI outputs before relying on them, without replacing human judgment.
+## 1. Core Product Change
 
-## 2. Solution
+Reasoning Lens should no longer ask users to select broad improvement actions like:
 
-### Product Name
+- Make assumptions visible
+- Add missing details
+- Mark parts to be careful with
 
-**Reasoning Lens**
+Instead, the inspection layer should work like this:
 
-### Product Type
+1. User opens Reasoning Lens.
+2. Claude shows 3 inspection cards:
+   - `What Claude assumed`
+   - `What to be careful about`
+   - `What’s missing`
+3. The first two cards are purely informative.
+4. The third card includes a CTA:
+   - `Add more context`
+5. Only clicking that CTA starts follow-up questions.
+6. After those questions are answered, Claude generates a final improved answer.
 
-A simulated native Claude feature shown through a static web prototype.
+Remove:
 
-### Core Concept
+- action toggle cards
+- continue button
+- multi-select action logic
+- What Changed block
+- final reflection prompt
 
-Reasoning Lens opens after Claude generates an answer. It helps users inspect:
+## 2. Required Flows
 
-- what Claude assumed
-- what is missing
-- what to be careful about
-
-The product should reduce cognitive overload by using **3 clear inspection areas**, not 6.
-
-### Design Principle
-
-Claude should help users think better, not act as the final authority.
-
-## 3. Prototype Scope
-
-### Required Flows
-
-The prototype must support 2 complete guided flows:
+Support 2 guided flows:
 
 1. `Interview Preparation`
 2. `Research Synthesis`
 
-Each flow must include:
+Each must include:
 
 - predefined prompt
-- initial Claude output
-- 3 Reasoning Lens inspection cards
-- 3 aligned improvement actions
-- optional follow-up questions only when missing details are selected
-- deterministic final polished output
+- initial Claude answer
+- 3 inspection cards
+- hardcoded missing-context follow-up questions
+- final improved answer only after context is added
 
-### Out Of Scope
+## 3. Screen Behavior
 
-Do not build:
+## Claude Home
 
-- real Claude API integration
-- login/signup
-- backend
-- database
-- file upload
-- payment
-- generic chatbot
-- generic trust score
-- live internet research
-- freeform prompt input
+Keep the existing Claude-style home screen, composer flow, sidebar, and demo picker behavior.
 
-## 4. Information Architecture
+## Claude Chat Simulation
 
-### Left Sidebar
+Keep the existing send interaction, `Thinking...` delay, and progressive first-response rendering.
 
-The app should feel like native Claude, not a custom dashboard. The sidebar remains visual/contextual only. It must not become the main place for flow selection.
+## Reasoning Lens Panel
 
-### Main Workspace
-
-The main workspace contains:
-
-- centered Claude-style greeting
-- Claude-style composer
-- guided demo picker
-- initial hardcoded Claude response
-- `Review with Reasoning Lens` CTA
-- right-side inspection panel
-- follow-up question flow when required
-- final revised Claude response in the same thread
-
-### Demo Selection
-
-The user selects the guided demo from the main composer flow, not from the sidebar.
-
-## 5. Screen Specifications
-
-## Screen 1 — Claude Home / Guided Demo Entry
-
-The user lands on the Claude-like home screen, opens the guided demo picker from the composer, and chooses either `Interview Preparation` or `Research Synthesis`. The selected prompt is inserted into the composer. The user does not type a custom prompt.
-
-## Screen 2 — Claude Chat Simulation
-
-The selected prompt appears in the composer with the selected flow chip. The user clicks the Claude-style upward-arrow send button. Claude shows a short `Thinking...` state and then progressively renders the initial hardcoded response.
-
-## Screen 3 — Generated Output
-
-The thread shows:
-
-- the user prompt
-- Claude’s initial answer
-- a post-response action row with:
-  - `Copy`
-  - `Retry`
-  - `Review with Reasoning Lens`
-
-Only `Review with Reasoning Lens` needs to be functional.
-
-## Screen 5 — Reasoning Lens Panel
-
-The Reasoning Lens panel opens beside the conversation on desktop and may stack below it on smaller screens.
-
-Panel title:
-`Reasoning Lens`
-
-Panel subtitle:
-`This does not decide for you. It helps you inspect the output before relying on it.`
-
-Do not include:
-
-- trust scores
-- correctness badges
-- safe-to-use labels
-
-### Required Inspection Areas
-
-Show exactly these 3 inspection cards:
+When the user clicks `Review with Reasoning Lens`, open the side panel and show exactly 3 cards in this order:
 
 1. `What Claude assumed`
-2. `What’s missing`
-3. `What to be careful about`
+2. `What to be careful about`
+3. `What’s missing`
 
-These replace the older 6-area structure.
+All 3 cards must be expanded by default.
 
-### Interaction
+Cards remain collapsible.
 
-- Cards are expandable/collapsible
-- `What Claude assumed` is expanded by default
-- Multiple cards may be expanded at once
-- Cards contain only:
-  - title
-  - severity
-  - explanation
-  - bullets
+Cards must contain only:
 
-Cards must **not** include vague end-of-card questions.
+- title
+- severity
+- explanation
+- bullets
 
-## Screen 5A — Interview Preparation Lens Content
+Do not show question prompts at the end of the cards.
 
-### Card 1 — What Claude assumed
+## Missing Context CTA
+
+Only the `What’s missing` card contains:
+
+Button:
+`Add more context`
+
+Microcopy:
+`Claude can use a few extra details to rewrite this into a stronger answer.`
+
+For the interview flow, use the flow-specific PM-transition version of that microcopy. For the research flow, use the audience/use-case version.
+
+## Follow-Up Question Flow
+
+After clicking `Add more context`:
+
+- Claude asks one hardcoded question at a time in the same chat thread
+- the response appears in the composer textbox only after the question finishes typing
+- the user sends the response with the same orange arrow
+- the sent response appears in the thread immediately
+- then Claude shows `Thinking...`
+- then the next question or final answer appears
+
+## Final Improved Answer
+
+After all missing-context questions are answered:
+
+- show one polished final Claude response in the same thread
+- do not show assumptions sections
+- do not show caution sections
+- do not show a What Changed block
+- do not show a reflection prompt
+
+## 4. Interview Preparation Content
+
+### Inspection Cards
+
+#### Card 1 — What Claude assumed
 
 Severity:
 `Medium attention`
 
 Explanation:
-`Claude made a few assumptions while turning your analytics background into a PM interview answer.`
+`Claude assumed your analytics background naturally supports a PM transition, but that only works if the story shows product judgment.`
 
 Bullets:
 
-- Assumes your analytics work involved user or customer-facing problems.
-- Assumes you have worked with stakeholders beyond analysis delivery.
-- Assumes you want PM for ownership and impact, not only career growth.
+- Assumes your analytics work involved diagnosing user or customer behavior, not only reporting metrics.
+- Assumes you can connect analysis to a product recommendation or decision.
+- Assumes a data-heavy PM role is a credible target for your transition.
 
-### Card 2 — What’s missing
+#### Card 2 — What to be careful about
+
+Severity:
+`Medium attention`
+
+Explanation:
+`The original answer sounds polished, but it can become risky if it overclaims ownership or stays too broad.`
+
+Bullets:
+
+- Do not say you owned the product change if you mainly identified and recommended it.
+- Be specific about the user problem, not just the metric you analyzed.
+- Avoid generic PM language like “intersection of users, business, and technology” unless it is backed by a concrete story.
+
+#### Card 3 — What’s missing
 
 Severity:
 `High attention`
 
 Explanation:
-`The answer sounds polished, but it lacks the details that would make it specific to you.`
+`The answer needs specific context before Claude can rewrite it into something meaningfully stronger.`
 
 Bullets:
 
-- No concrete project example.
-- No target PM role or company context.
-- No clear reason for why you want to switch now.
-- Limited proof that you can think like a PM.
+- A concrete analytics project.
+- The user or customer problem behind the metric.
+- The product recommendation you made.
+- The type of PM role you are targeting.
 
-### Card 3 — What to be careful about
+CTA:
+`Add more context`
 
-Severity:
-`Medium attention`
+Microcopy:
+`Claude can use these details to rewrite the answer around a sharper PM transition story.`
 
-Explanation:
-`The answer may sound credible, but some parts could feel generic or hard to defend.`
+### Follow-Up Questions
 
-Bullets:
+Question 1:
+`What is one real analytics project that shows PM-like judgment, not just reporting?`
 
-- The phrase “intersection of users, business, and technology” is common and may sound rehearsed.
-- Claims about stakeholder management should only be used if you can defend them.
-- The answer needs tailoring depending on the company and PM role.
+Hardcoded response:
+`Use a project where I analyzed customer support enquiries about payments being stuck in “processing” for too long. The same generic status was shown even when payments were delayed or stuck between the sender and receiver bank, so customers did not know whether to wait, retry, or contact support. I broke down the payment journey, identified where the ambiguity was creating enquiry calls, and recommended clearer status messages plus proactive notifications for delayed or stuck payments.`
 
-## Screen 5B — Research Synthesis Lens Content
+Question 2:
+`What kind of PM role should this answer be shaped for?`
 
-### Card 1 — What Claude assumed
+Hardcoded response:
+`Shape it for a Data Product Manager role. I want the answer to show that my analytics background is directly relevant because Data PMs need to turn unclear data signals into product direction, measurement strategy, and better decision-making for teams.`
+
+### Final Improved Answer
+
+Heading:
+`A stronger answer could be:`
+
+Answer:
+
+`I want to move into Product Management because the part of analytics I enjoy most is not just finding insights, but using those insights to shape better product decisions.`
+
+`One project that made this clear involved customer support enquiries around payments being stuck in “processing” for too long. At first, the issue looked like a support-volume problem. But when I looked deeper, I saw that the same generic status was being shown even when payments were delayed or stuck between the sender and receiver bank. Customers did not know whether to wait, retry, or contact support, so the lack of clarity was creating unnecessary anxiety and enquiry calls.`
+
+`I broke down the payment journey, identified where the ambiguity was happening, and recommended clearer status messages along with proactive notifications for delayed or stuck payments. That experience felt close to product work because the real problem was not just the metric. It was the user uncertainty behind the metric. The value came from translating an unclear data signal into a sharper user problem, a product recommendation, and a way to measure whether the experience improved.`
+
+`That is why I am especially interested in Data Product Management. My analytics background aligns well with Data PM because the role requires turning ambiguous signals into product direction, defining the right success metrics, and helping teams make better decisions. I now want to move closer to where those decisions are framed and prioritized, rather than only analyzing the outcomes after the fact.`
+
+`So for me, PM is not a generic career pivot. It is a focused move from measuring product and customer outcomes to helping shape the data-informed product decisions that create those outcomes.`
+
+## 5. Research Synthesis Content
+
+### Inspection Cards
+
+#### Card 1 — What Claude assumed
 
 Severity:
 `Medium attention`
@@ -215,22 +223,7 @@ Bullets:
 - Assumes benefits and risks should be weighted equally.
 - Assumes early-career professionals are the main user group.
 
-### Card 2 — What’s missing
-
-Severity:
-`High attention`
-
-Explanation:
-`The synthesis lacks source boundaries, audience context, and concrete examples.`
-
-Bullets:
-
-- No sources or evidence strength are mentioned.
-- No distinction between writing, research, coding, and decision-making tasks.
-- No workplace examples.
-- No clarity on whether the goal is to inform, persuade, or recommend action.
-
-### Card 3 — What to be careful about
+#### Card 2 — What to be careful about
 
 Severity:
 `High attention`
@@ -240,114 +233,69 @@ Explanation:
 
 Bullets:
 
-- Effects may differ for beginners and domain experts.
-- Long-term effects on judgment are uncertain.
-- The answer should not imply that AI always improves or always weakens thinking.
-- The usefulness depends heavily on how actively the user evaluates the output.
+- AI does not automatically improve or weaken thinking; the effect depends on how users evaluate outputs.
+- The risk is not only hallucination, but also over-trusting fluent reasoning.
+- The answer needs examples or evidence if it will be used in a formal workplace presentation.
 
-## Screen 6 — Improvement Action Selection
+#### Card 3 — What’s missing
 
-Below the 3 inspection cards, show 3 multi-select improvement actions.
+Severity:
+`High attention`
 
-Use exactly this mapping:
+Explanation:
+`The synthesis needs audience and usage context before Claude can make it more practical.`
 
-```js
-[
-  {
-    id: "assumptions",
-    title: "What Claude assumed",
-    actionId: "makeAssumptionsVisible",
-    actionLabel: "Make assumptions visible",
-    requiresInput: false
-  },
-  {
-    id: "missing",
-    title: "What’s missing",
-    actionId: "addMissingDetails",
-    actionLabel: "Add missing details",
-    requiresInput: true
-  },
-  {
-    id: "careful",
-    title: "What to be careful about",
-    actionId: "markCarefulParts",
-    actionLabel: "Mark parts to be careful with",
-    requiresInput: false
-  }
-]
-```
+Bullets:
 
-### UI Behavior
+- Who the presentation is for.
+- How the audience currently uses AI.
+- What behavior the synthesis should change.
+- Whether the goal is to inform, persuade, or recommend action.
 
-- Actions are toggle cards or checkbox-style cards
-- User can select one action
-- User can select multiple actions
-- User can select all three
-- User can deselect selected actions
-- `Continue` stays disabled until at least one action is selected
+CTA:
+`Add more context`
 
-Each action card shows:
+Microcopy:
+`Claude can use these details to rewrite the synthesis for the actual audience and use case.`
 
-- label
-- mapped Lens area
-- whether extra input is needed
-
-## Screen 7 — Conditional Follow-Up Questions And Final Output
-
-### Case 1 — Only No-Input Actions Selected
-
-If the selected actions are only:
-
-- `makeAssumptionsVisible`
-- `markCarefulParts`
-
-then:
-
-- do not ask follow-up questions
-- show the final revised output immediately
-
-### Case 2 — `addMissingDetails` Selected
-
-If selected actions include `addMissingDetails`, then:
-
-- ask only the hardcoded missing-detail questions for the active flow
-- ask them one at a time in the same thread
-- show the hardcoded response as a selectable user-style option
-- after all required questions are answered, show the final revised output
-
-### Interview Preparation Follow-Up Questions
+### Follow-Up Questions
 
 Question 1:
-`To make this answer feel specific to you, which real experience should Claude anchor it around?`
+`Who is this synthesis meant for, and how are they using AI today?`
 
 Hardcoded response:
-`Use my analytics project where I found friction in a customer workflow, turned the analysis into product recommendations, and worked with stakeholders to improve the experience.`
+`It is for a workplace team of early-career analysts, PMs, and engineers who already use AI to draft documents, summarize research, debug code, and prepare recommendations. They are productive with AI, but they do not have a consistent way to judge whether the output is actually good.`
 
 Question 2:
-`What kind of PM role should this answer be shaped for?`
+`What should this synthesis help them do differently?`
 
 Hardcoded response:
-`Shape it for an Associate Product Manager or early-career PM role where analytical thinking, user empathy, and stakeholder management are important.`
+`It should help them stop treating polished AI responses as finished work. They should learn to check assumptions, missing context, evidence quality, and whether the answer fits the decision they are actually making.`
 
-### Research Synthesis Follow-Up Questions
+### Final Improved Answer
 
-Question 1:
-`Who is this synthesis meant for?`
+Heading:
+`A stronger synthesis is:`
 
-Hardcoded response:
-`It is for a workplace team of early-career professionals who already use AI tools for writing, research, coding, and decision-making.`
+Answer:
 
-Question 2:
-`What should this synthesis help them understand or decide?`
+`AI tools can improve critical thinking when they help users examine a problem from more angles. They can weaken critical thinking when users treat a polished response as if the thinking has already been done.`
 
-Hardcoded response:
-`It should help them understand when AI helps them think better, when it makes them over-rely on polished outputs, and how to evaluate AI responses before using them in real work.`
+`For a workplace team of early-career analysts, PMs, and engineers, this distinction matters because AI is already part of real work: drafting documents, summarizing research, debugging code, and preparing recommendations. The risk is not only that AI may be factually wrong. The deeper risk is that a fluent answer can make weak reasoning feel complete.`
+
+`AI is most helpful when it keeps the user intellectually active. For example, it can help generate alternatives, challenge a first draft, summarize unfamiliar material, or compare possible explanations. In these cases, the user still has to judge whether the output is relevant, complete, and defensible.`
+
+`AI is most harmful when it compresses the evaluation step. A user may read a structured, confident answer and skip the harder questions: What assumptions did this make? What context is missing? Is the evidence strong enough? Does this apply to my situation? What would make this wrong?`
+
+`The effect also depends on the task. For low-risk drafting, AI may mainly improve speed. For research synthesis, coding, strategy, career decisions, or workplace recommendations, weak reasoning can propagate into real work if the user does not inspect the output carefully.`
+
+`The practical takeaway is that AI should be used as a thinking partner, not as a substitute for judgment. The user’s job is not just to ask for an answer, but to evaluate whether the answer deserves to be used.`
 
 ## 6. Functional Requirements
 
 Use local React state only.
 
-### Required State
+Required state:
 
 - `selectedFlow`
 - `isDemoPickerOpen`
@@ -355,142 +303,53 @@ Use local React state only.
 - `hasGeneratedOutput`
 - `isLensOpen`
 - `expandedLensCards`
-- `selectedActions`
-- `currentQuestionIndex`
-- `requiredQuestions`
-- `answeredQuestions`
-- `isQuestionFlowActive`
+- `isContextFlowActive`
+- `currentContextQuestionIndex`
+- `answeredContextQuestions`
 - `showFinalOutput`
 
-### Action Metadata Requirements
-
-Each action must include:
+Default expanded cards:
 
 ```js
-{
-  id: "addMissingDetails",
-  label: "Add missing details",
-  mapsToLensCard: "missing",
-  requiresInput: true,
-  followUpQuestions: []
-}
+["assumptions", "careful", "missing"]
 ```
 
-### Dynamic Question Derivation
+Behavior:
 
-Use a data-driven approach:
+- Clicking `Add more context` sets `isContextFlowActive = true`
+- Claude shows the first context question
+- User sends the hardcoded response with the composer arrow
+- Response is added to `answeredContextQuestions`
+- Claude advances to the next question
+- After all context questions are answered:
+  - `isContextFlowActive = false`
+  - `showFinalOutput = true`
+  - final improved answer is rendered
 
-```js
-requiredQuestions = selectedActions
-  .map(actionId => actionMetadata[actionId])
-  .filter(action => action.requiresInput)
-  .flatMap(action => action.followUpQuestions)
-```
+## 7. Acceptance Criteria
 
-This must support all 7 non-empty combinations of 3 actions without writing manual conditionals for every permutation.
+1. Reasoning Lens shows exactly 3 cards.
+2. Card order is:
+   - What Claude assumed
+   - What to be careful about
+   - What’s missing
+3. All 3 cards are expanded by default.
+4. First two cards do not show buttons.
+5. Only What’s missing shows Add more context.
+6. Clicking Add more context starts follow-up questions.
+7. Interview flow asks the updated payment-processing/Data PM questions.
+8. Research flow asks the updated workplace team/evaluation behavior questions.
+9. What Changed block/card is removed.
+10. Final reflection prompts are removed.
+11. Final improved answer appears only after context questions are answered.
+12. Final improved answer is polished and complete.
+13. UI still matches Claude visual design.
+14. `npm run build` passes.
 
-### Final Output Builder
+## 8. Implementation Notes
 
-The final output must be built deterministically from:
-
-1. base final answer per flow
-2. conditional paragraph variant for `addMissingDetails`
-3. optional assumptions section for `makeAssumptionsVisible`
-4. optional caution section for `markCarefulParts`
-5. dynamic `What changed` card based only on selected actions
-
-The user must always see a complete polished answer, not disconnected snippets.
-
-## 7. Technical Stack
-
-Use:
-
-- React
-- Vite
-- JavaScript
-- plain CSS
-- Lucide React for icons
-
-The app must remain compatible with Vercel static deployment.
-
-## 8. Design Language Specification
-
-Preserve the existing Claude-native dark theme, sidebar, composer behavior, spacing rhythm, and Vercel compatibility. The new inspection and improvement flow must fit inside the established interface rather than introducing a new visual language.
-
-## 9. Copy Rules
-
-Use simple, understandable language. Avoid jargon-heavy inspection titles such as:
-
-- Reasoning Gaps
-- Human Judgment Needed
-- Alternative Perspectives
-- Confidence Calibration
-- Epistemic uncertainty
-
-The 3 inspection areas should be understandable to a normal user.
-
-## 10. Acceptance Criteria
-
-The prototype is complete when:
-
-1. Only 3 Reasoning Lens areas are shown.
-2. Lens area titles are simple and easy to understand.
-3. Lens cards do not show questions.
-4. User can select one action.
-5. User can select multiple actions.
-6. User can deselect actions.
-7. `Continue` is disabled until at least one action is selected.
-8. Selecting only `makeAssumptionsVisible` directly shows final output.
-9. Selecting only `markCarefulParts` directly shows final output.
-10. Selecting `addMissingDetails` asks only missing-detail questions.
-11. Selecting `makeAssumptionsVisible + markCarefulParts` directly shows final output with both improvements.
-12. Selecting `addMissingDetails + makeAssumptionsVisible` asks only missing-detail questions and includes both improvements in final output.
-13. Selecting `addMissingDetails + markCarefulParts` asks only missing-detail questions and includes both improvements in final output.
-14. Selecting all three actions asks only missing-detail questions and includes all three improvements in final output.
-15. Final output is a complete polished answer, not disconnected text blocks.
-16. The final `What changed` card only includes selected improvements.
-17. Both Interview Preparation and Research Synthesis flows work.
-18. The app still matches the Claude visual direction.
-19. `npm run build` passes.
-
-## 11. Recommended File Structure
-
-```txt
-reasoning_lens_prototype/
-  package.json
-  documents/
-    spec.md
-    architecture.md
-  design/
-    claude-ui-reference.png
-  src/
-    main.jsx
-    App.jsx
-    data/
-      flows.js
-    components/
-      Sidebar.jsx
-      ClaudeHome.jsx
-      ChatSimulation.jsx
-      Composer.jsx
-      DemoPicker.jsx
-      MessageThread.jsx
-      PostResponseActions.jsx
-      ReasoningLensPanel.jsx
-      LensModuleCard.jsx
-      ActionPanel.jsx
-      RevisedOutput.jsx
-    styles/
-      globals.css
-      layout.css
-```
-
-## 12. Implementation Notes For AI Coding Assistant
-
-- keep all content hardcoded
-- do not add backend, APIs, auth, or database
-- preserve Claude-native visuals
-- preserve composer-based flow selection
-- do not reintroduce a generic final output
-- final output must always reflect the selected improvements
-- use a deterministic builder rather than hardcoding all 7 final permutations
+- preserve the existing Claude-native visual design
+- do not change the sidebar/composer architecture
+- do not add backend or live AI
+- only missing context should trigger follow-up questions
+- the final improved answer should be shown only after context questions are answered

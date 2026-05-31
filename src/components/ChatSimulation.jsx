@@ -8,37 +8,30 @@ function ChatSimulation({
   isGenerating,
   isLensOpen,
   expandedLensCards,
-  selectedActions,
-  currentQuestionIndex,
-  requiredQuestions,
-  answeredQuestions,
-  isQuestionFlowActive,
+  isContextFlowActive,
+  currentContextQuestionIndex,
+  answeredContextQuestions,
   isFollowupThinking,
   showFinalOutput,
   finalOutput,
   onOpenLens,
   onCloseLens,
   onToggleLensCard,
-  onToggleAction,
-  onContinueActions,
-  onSendQuestionResponse,
+  onStartContextFlow,
+  onSendContextResponse,
   onComposerClick,
   onSendPrompt
 }) {
   const [isQuestionReadyForResponse, setIsQuestionReadyForResponse] = useState(false);
+  const currentQuestion = activeFlow.contextQuestions[currentContextQuestionIndex];
 
   useEffect(() => {
-    if (
-      !isQuestionFlowActive ||
-      isFollowupThinking ||
-      !requiredQuestions[currentQuestionIndex]
-    ) {
+    if (!isContextFlowActive || isFollowupThinking || !currentQuestion) {
       setIsQuestionReadyForResponse(false);
       return undefined;
     }
 
-    const wordCount =
-      requiredQuestions[currentQuestionIndex].question.split(" ").length;
+    const wordCount = currentQuestion.question.split(" ").length;
     const revealDuration = Math.ceil(wordCount / 2) * 40 + 80;
 
     setIsQuestionReadyForResponse(false);
@@ -47,15 +40,8 @@ function ChatSimulation({
       setIsQuestionReadyForResponse(true);
     }, revealDuration);
 
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [
-    currentQuestionIndex,
-    isFollowupThinking,
-    isQuestionFlowActive,
-    requiredQuestions
-  ]);
+    return () => window.clearTimeout(timer);
+  }, [currentQuestion, isContextFlowActive, isFollowupThinking]);
 
   return (
     <section className="workspace-stage workspace-stage-chat">
@@ -64,26 +50,23 @@ function ChatSimulation({
           activeFlow={activeFlow}
           isGenerating={isGenerating}
           isLensOpen={isLensOpen}
-          currentQuestionIndex={currentQuestionIndex}
-          requiredQuestions={requiredQuestions}
-          answeredQuestions={answeredQuestions}
-          isQuestionFlowActive={isQuestionFlowActive}
+          currentContextQuestionIndex={currentContextQuestionIndex}
+          answeredContextQuestions={answeredContextQuestions}
+          isContextFlowActive={isContextFlowActive}
           isFollowupThinking={isFollowupThinking}
           showFinalOutput={showFinalOutput}
           finalOutput={finalOutput}
           onOpenLens={onOpenLens}
-          selectedActions={selectedActions}
         />
 
         {isLensOpen ? (
           <ReasoningLensPanel
             activeFlow={activeFlow}
             expandedLensCards={expandedLensCards}
-            selectedActions={selectedActions}
+            isContextFlowActive={isContextFlowActive}
             onCloseLens={onCloseLens}
             onToggleLensCard={onToggleLensCard}
-            onToggleAction={onToggleAction}
-            onContinueActions={onContinueActions}
+            onStartContextFlow={onStartContextFlow}
           />
         ) : null}
       </div>
@@ -91,29 +74,20 @@ function ChatSimulation({
       <Composer
         activeFlow={activeFlow}
         hasPromptLoaded={Boolean(
-          isQuestionFlowActive &&
-            requiredQuestions[currentQuestionIndex] &&
-            !isFollowupThinking &&
-            isQuestionReadyForResponse
+          isContextFlowActive && currentQuestion && !isFollowupThinking && isQuestionReadyForResponse
         )}
         customPromptText={
-          isQuestionFlowActive &&
-          requiredQuestions[currentQuestionIndex] &&
-          isQuestionReadyForResponse
-            ? requiredQuestions[currentQuestionIndex].hardcodedResponse
+          isContextFlowActive && currentQuestion && isQuestionReadyForResponse
+            ? currentQuestion.hardcodedResponse
             : ""
         }
-        isSendEnabled={
-          Boolean(
-            isQuestionFlowActive &&
-              requiredQuestions[currentQuestionIndex] &&
-              isQuestionReadyForResponse
-          ) && !isFollowupThinking
-        }
+        isSendEnabled={Boolean(
+          isContextFlowActive && currentQuestion && isQuestionReadyForResponse && !isFollowupThinking
+        )}
         isDemoPickerOpen={false}
         onComposerClick={onComposerClick}
         onSelectFlow={() => {}}
-        onSendPrompt={isQuestionFlowActive ? onSendQuestionResponse : onSendPrompt}
+        onSendPrompt={isContextFlowActive ? onSendContextResponse : onSendPrompt}
         helperText="Guided prototype — response is preloaded for demo reliability."
         placeholderText=""
         showFlowChip={false}

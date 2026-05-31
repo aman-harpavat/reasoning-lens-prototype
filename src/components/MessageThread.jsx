@@ -15,14 +15,11 @@ function ProgressiveQuestion({ text }) {
           window.clearInterval(interval);
           return current;
         }
-
         return current + 2;
       });
     }, 40);
 
-    return () => {
-      window.clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [words]);
 
   return <p>{words.slice(0, visibleWordCount).join(" ")}</p>;
@@ -32,15 +29,13 @@ function MessageThread({
   activeFlow,
   isGenerating,
   isLensOpen,
-  currentQuestionIndex,
-  requiredQuestions,
-  answeredQuestions,
-  isQuestionFlowActive,
+  currentContextQuestionIndex,
+  answeredContextQuestions,
+  isContextFlowActive,
   isFollowupThinking,
   showFinalOutput,
   finalOutput,
-  onOpenLens,
-  selectedActions
+  onOpenLens
 }) {
   const paragraphWords = useMemo(
     () => activeFlow.initialOutput.map((paragraph) => paragraph.split(" ")),
@@ -66,29 +61,24 @@ function MessageThread({
           window.clearInterval(interval);
           return current;
         }
-
         return current + 2;
       });
     }, 40);
 
-    return () => {
-      window.clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [isGenerating, totalWords, activeFlow]);
 
   const visibleParagraphs = useMemo(() => {
     let remainingWords = visibleWordCount;
-
     return paragraphWords.map((words) => {
-      if (remainingWords <= 0) {
-        return "";
-      }
-
+      if (remainingWords <= 0) return "";
       const sliceCount = Math.min(words.length, remainingWords);
       remainingWords -= sliceCount;
       return words.slice(0, sliceCount).join(" ");
     });
   }, [paragraphWords, visibleWordCount]);
+
+  const currentQuestion = activeFlow.contextQuestions[currentContextQuestionIndex];
 
   return (
     <div className="message-thread">
@@ -112,17 +102,11 @@ function MessageThread({
                 </div>
 
                 {visibleWordCount >= totalWords ? (
-                  <PostResponseActions
-                    isLensOpen={isLensOpen}
-                    onOpenLens={onOpenLens}
-                  />
+                  <PostResponseActions isLensOpen={isLensOpen} onOpenLens={onOpenLens} />
                 ) : null}
 
-                {answeredQuestions.map((question) => (
-                  <div
-                    key={question.id}
-                    className="question-flow-step question-flow-step-complete"
-                  >
+                {answeredContextQuestions.map((question) => (
+                  <div key={question.id} className="question-flow-step question-flow-step-complete">
                     <div className="message-row message-row-assistant">
                       <div className="message-block">
                         <div className="message-copy message-copy-question">
@@ -139,14 +123,12 @@ function MessageThread({
                   </div>
                 ))}
 
-                {isQuestionFlowActive && requiredQuestions[currentQuestionIndex] ? (
+                {isContextFlowActive && currentQuestion ? (
                   <div className="question-flow-step">
                     <div className="message-row message-row-assistant">
                       <div className="message-block">
                         <div className="message-copy message-copy-question">
-                          <ProgressiveQuestion
-                            text={requiredQuestions[currentQuestionIndex].question}
-                          />
+                          <ProgressiveQuestion text={currentQuestion.question} />
                         </div>
                       </div>
                     </div>
@@ -166,11 +148,7 @@ function MessageThread({
                 ) : null}
 
                 {showFinalOutput && finalOutput ? (
-                  <RevisedOutput
-                    finalOutput={finalOutput}
-                    actions={activeFlow.actions}
-                    selectedActions={selectedActions}
-                  />
+                  <RevisedOutput finalOutput={finalOutput} />
                 ) : null}
               </>
             )}

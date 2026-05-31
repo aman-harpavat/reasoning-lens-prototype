@@ -1,109 +1,25 @@
-const buildWhatChanged = (mappings, selectedActions) =>
-  selectedActions.map((actionId) => mappings[actionId]).filter(Boolean);
+const buildInterviewFinalOutput = () => ({
+  heading: "A stronger answer could be:",
+  paragraphs: [
+    "I want to move into Product Management because the part of analytics I enjoy most is not just finding insights, but using those insights to shape better product decisions.",
+    "One project that made this clear involved customer support enquiries around payments being stuck in “processing” for too long. At first, the issue looked like a support-volume problem. But when I looked deeper, I saw that the same generic status was being shown even when payments were delayed or stuck between the sender and receiver bank. Customers did not know whether to wait, retry, or contact support, so the lack of clarity was creating unnecessary anxiety and enquiry calls.",
+    "I broke down the payment journey, identified where the ambiguity was happening, and recommended clearer status messages along with proactive notifications for delayed or stuck payments. That experience felt close to product work because the real problem was not just the metric. It was the user uncertainty behind the metric. The value came from translating an unclear data signal into a sharper user problem, a product recommendation, and a way to measure whether the experience improved.",
+    "That is why I am especially interested in Data Product Management. My analytics background aligns well with Data PM because the role requires turning ambiguous signals into product direction, defining the right success metrics, and helping teams make better decisions. I now want to move closer to where those decisions are framed and prioritized, rather than only analyzing the outcomes after the fact.",
+    "So for me, PM is not a generic career pivot. It is a focused move from measuring product and customer outcomes to helping shape the data-informed product decisions that create those outcomes."
+  ]
+});
 
-const buildInterviewFinalOutput = ({ selectedActions }) => {
-  const includeAssumptions = selectedActions.includes("makeAssumptionsVisible");
-  const includeMissingDetails = selectedActions.includes("addMissingDetails");
-  const includeCarefulParts = selectedActions.includes("markCarefulParts");
-
-  return {
-    heading: "A stronger answer could be:",
-    paragraphs: [
-      "I want to move into Product Management because I have realized that the part of my analytics work I enjoy most is not just finding insights, but turning those insights into better product and business decisions.",
-      includeMissingDetails
-        ? "In one analytics project, I found friction in a customer workflow, turned the analysis into product recommendations, and worked with stakeholders to improve the experience. That made the PM path feel more concrete to me because I saw how much I enjoyed connecting user problems, business impact, and execution."
-        : "In my analytics work, I have often had to understand user behavior, diagnose problems through data, and translate insights into recommendations. That made the PM path feel more concrete to me because I enjoy connecting user problems, business impact, and execution.",
-      "Product Management feels like the right next step because it lets me build on my analytical foundation while taking more ownership of problem discovery, prioritization, stakeholder alignment, and solution shaping.",
-      "So for me, PM is not a random pivot. It is a move from analyzing outcomes to helping shape the product decisions that create those outcomes."
-    ],
-    assumptionsSection: includeAssumptions
-      ? {
-          title: "Assumptions this answer is relying on:",
-          bullets: [
-            "Your analytics work involved user, customer, or business problems.",
-            "You can explain your contribution to the project clearly in follow-up questions.",
-            "The target PM role values analytical thinking as a strength."
-          ]
-        }
-      : null,
-    cautionSection: includeCarefulParts
-      ? {
-          title: "Before using this, be careful with:",
-          bullets: [
-            "Do not claim stakeholder influence unless you can explain what you actually did.",
-            "Replace any generic wording with your real project details wherever possible.",
-            "Tailor the answer depending on whether the role is growth, platform, consumer, or B2B PM."
-          ]
-        }
-      : null,
-    whatChanged: buildWhatChanged(
-      {
-        makeAssumptionsVisible:
-          "Made the assumptions behind the interview answer visible.",
-        addMissingDetails:
-          "Anchored the answer around a concrete analytics project and early-career PM role context.",
-        markCarefulParts:
-          "Highlighted parts that need tailoring or should not be overstated."
-      },
-      selectedActions
-    ),
-    reflectionPrompt:
-      "Before using this answer, refine the project example so it reflects your actual experience and can be defended in follow-up interview questions."
-  };
-};
-
-const buildResearchFinalOutput = ({ selectedActions }) => {
-  const includeAssumptions = selectedActions.includes("makeAssumptionsVisible");
-  const includeMissingDetails = selectedActions.includes("addMissingDetails");
-  const includeCarefulParts = selectedActions.includes("markCarefulParts");
-
-  return {
-    heading: "A stronger synthesis is:",
-    paragraphs: [
-      "AI tools can improve critical thinking when they are used to expand a user’s thinking, but they can weaken critical thinking when they replace the user’s evaluation process.",
-      includeMissingDetails
-        ? "For a workplace team of early-career professionals using AI for writing, research, coding, and decision-making, the practical question is not whether AI is good or bad. The question is when it helps people think better and when it makes them over-rely on polished outputs."
-        : "For early-career professionals, the practical question is not whether AI is good or bad. The question is when it helps people think better and when it makes them over-rely on polished outputs.",
-      "AI helps most when users use it to generate alternative explanations, compare arguments, summarize unfamiliar material, or pressure-test their own reasoning. In those cases, AI acts as a thinking partner.",
-      "The risk appears when users treat polished AI outputs as finished answers. Because AI responses often sound complete and confident, users may skip important evaluation steps: checking assumptions, looking for missing context, comparing viewpoints, or asking whether the answer applies to their situation.",
-      "The impact also depends on task type and user expertise. AI may be relatively low-risk for drafting, but higher-risk for research, strategy, coding, career decisions, or workplace recommendations where weak reasoning can propagate into downstream work.",
-      "The practical takeaway: AI is most valuable when users actively evaluate its outputs. It should be used to improve judgment, not bypass it."
-    ],
-    assumptionsSection: includeAssumptions
-      ? {
-          title: "Assumptions this synthesis is relying on:",
-          bullets: [
-            "The audience already has some familiarity with AI tools.",
-            "The core issue is judgment quality, not only productivity.",
-            "The synthesis is meant to guide practical workplace use rather than make a universal claim about AI."
-          ]
-        }
-      : null,
-    cautionSection: includeCarefulParts
-      ? {
-          title: "Before using this, be careful with:",
-          bullets: [
-            "Do not present these claims as universal without supporting evidence.",
-            "Clarify whether the presentation is meant to inform, persuade, or recommend action.",
-            "Add examples or citations if the synthesis will influence a real workplace decision."
-          ]
-        }
-      : null,
-    whatChanged: buildWhatChanged(
-      {
-        makeAssumptionsVisible:
-          "Made the assumptions behind the synthesis visible.",
-        addMissingDetails:
-          "Adapted the synthesis to a workplace audience of early-career AI users.",
-        markCarefulParts:
-          "Marked claims that should not be treated as universally certain."
-      },
-      selectedActions
-    ),
-    reflectionPrompt:
-      "Before using this synthesis, add supporting evidence, examples, or citations based on the audience and decision context."
-  };
-};
+const buildResearchFinalOutput = () => ({
+  heading: "A stronger synthesis is:",
+  paragraphs: [
+    "AI tools can improve critical thinking when they help users examine a problem from more angles. They can weaken critical thinking when users treat a polished response as if the thinking has already been done.",
+    "For a workplace team of early-career analysts, PMs, and engineers, this distinction matters because AI is already part of real work: drafting documents, summarizing research, debugging code, and preparing recommendations. The risk is not only that AI may be factually wrong. The deeper risk is that a fluent answer can make weak reasoning feel complete.",
+    "AI is most helpful when it keeps the user intellectually active. For example, it can help generate alternatives, challenge a first draft, summarize unfamiliar material, or compare possible explanations. In these cases, the user still has to judge whether the output is relevant, complete, and defensible.",
+    "AI is most harmful when it compresses the evaluation step. A user may read a structured, confident answer and skip the harder questions: What assumptions did this make? What context is missing? Is the evidence strong enough? Does this apply to my situation? What would make this wrong?",
+    "The effect also depends on the task. For low-risk drafting, AI may mainly improve speed. For research synthesis, coding, strategy, career decisions, or workplace recommendations, weak reasoning can propagate into real work if the user does not inspect the output carefully.",
+    "The practical takeaway is that AI should be used as a thinking partner, not as a substitute for judgment. The user’s job is not just to ask for an answer, but to evaluate whether the answer deserves to be used."
+  ]
+});
 
 export const flows = {
   interview: {
@@ -132,24 +48,11 @@ export const flows = {
         title: "What Claude assumed",
         severity: "Medium attention",
         explanation:
-          "Claude made a few assumptions while turning your analytics background into a PM interview answer.",
+          "Claude assumed your analytics background naturally supports a PM transition, but that only works if the story shows product judgment.",
         bullets: [
-          "Assumes your analytics work involved user or customer-facing problems.",
-          "Assumes you have worked with stakeholders beyond analysis delivery.",
-          "Assumes you want PM for ownership and impact, not only career growth."
-        ]
-      },
-      {
-        id: "missing",
-        title: "What’s missing",
-        severity: "High attention",
-        explanation:
-          "The answer sounds polished, but it lacks the details that would make it specific to you.",
-        bullets: [
-          "No concrete project example.",
-          "No target PM role or company context.",
-          "No clear reason for why you want to switch now.",
-          "Limited proof that you can think like a PM."
+          "Assumes your analytics work involved diagnosing user or customer behavior, not only reporting metrics.",
+          "Assumes you can connect analysis to a product recommendation or decision.",
+          "Assumes a data-heavy PM role is a credible target for your transition."
         ]
       },
       {
@@ -157,56 +60,44 @@ export const flows = {
         title: "What to be careful about",
         severity: "Medium attention",
         explanation:
-          "The answer may sound credible, but some parts could feel generic or hard to defend.",
+          "The original answer sounds polished, but it can become risky if it overclaims ownership or stays too broad.",
         bullets: [
-          "The phrase “intersection of users, business, and technology” is common and may sound rehearsed.",
-          "Claims about stakeholder management should only be used if you can defend them.",
-          "The answer needs tailoring depending on the company and PM role."
+          "Do not say you owned the product change if you mainly identified and recommended it.",
+          "Be specific about the user problem, not just the metric you analyzed.",
+          "Avoid generic PM language like “intersection of users, business, and technology” unless it is backed by a concrete story."
         ]
+      },
+      {
+        id: "missing",
+        title: "What’s missing",
+        severity: "High attention",
+        explanation:
+          "The answer needs specific context before Claude can rewrite it into something meaningfully stronger.",
+        bullets: [
+          "A concrete analytics project.",
+          "The user or customer problem behind the metric.",
+          "The product recommendation you made.",
+          "The type of PM role you are targeting."
+        ],
+        ctaLabel: "Add more context",
+        ctaMicrocopy:
+          "Claude can use these details to rewrite the answer around a sharper PM transition story."
       }
     ],
-    actions: [
+    contextQuestions: [
       {
-        id: "makeAssumptionsVisible",
-        label: "Make assumptions visible",
-        mapsToLensCard: "assumptions",
-        mapsToLensCardLabel: "What Claude assumed",
-        requiresInput: false,
-        inputStateLabel: "No extra input needed",
-        followUpQuestions: []
+        id: "project-story",
+        question:
+          "What is one real analytics project that shows PM-like judgment, not just reporting?",
+        hardcodedResponse:
+          "Use a project where I analyzed customer support enquiries about payments being stuck in “processing” for too long. The same generic status was shown even when payments were delayed or stuck between the sender and receiver bank, so customers did not know whether to wait, retry, or contact support. I broke down the payment journey, identified where the ambiguity was creating enquiry calls, and recommended clearer status messages plus proactive notifications for delayed or stuck payments."
       },
       {
-        id: "addMissingDetails",
-        label: "Add missing details",
-        mapsToLensCard: "missing",
-        mapsToLensCardLabel: "What’s missing",
-        requiresInput: true,
-        inputStateLabel: "Needs your input",
-        followUpQuestions: [
-          {
-            id: "anchor-experience",
-            question:
-              "To make this answer feel specific to you, which real experience should Claude anchor it around?",
-            hardcodedResponse:
-              "Use my analytics project where I found friction in a customer workflow, turned the analysis into product recommendations, and worked with stakeholders to improve the experience."
-          },
-          {
-            id: "target-role",
-            question:
-              "What kind of PM role should this answer be shaped for?",
-            hardcodedResponse:
-              "Shape it for an Associate Product Manager or early-career PM role where analytical thinking, user empathy, and stakeholder management are important."
-          }
-        ]
-      },
-      {
-        id: "markCarefulParts",
-        label: "Mark parts to be careful with",
-        mapsToLensCard: "careful",
-        mapsToLensCardLabel: "What to be careful about",
-        requiresInput: false,
-        inputStateLabel: "No extra input needed",
-        followUpQuestions: []
+        id: "role-shaping",
+        question:
+          "What kind of PM role should this answer be shaped for?",
+        hardcodedResponse:
+          "Shape it for a Data Product Manager role. I want the answer to show that my analytics background is directly relevant because Data PMs need to turn unclear data signals into product direction, measurement strategy, and better decision-making for teams."
       }
     ],
     finalOutputBuilder: buildInterviewFinalOutput
@@ -245,84 +136,53 @@ export const flows = {
         ]
       },
       {
-        id: "missing",
-        title: "What’s missing",
-        severity: "High attention",
-        explanation:
-          "The synthesis lacks source boundaries, audience context, and concrete examples.",
-        bullets: [
-          "No sources or evidence strength are mentioned.",
-          "No distinction between writing, research, coding, and decision-making tasks.",
-          "No workplace examples.",
-          "No clarity on whether the goal is to inform, persuade, or recommend action."
-        ]
-      },
-      {
         id: "careful",
         title: "What to be careful about",
         severity: "High attention",
         explanation:
           "The answer makes broad claims about critical thinking that should not be treated as universally certain.",
         bullets: [
-          "Effects may differ for beginners and domain experts.",
-          "Long-term effects on judgment are uncertain.",
-          "The answer should not imply that AI always improves or always weakens thinking.",
-          "The usefulness depends heavily on how actively the user evaluates the output."
+          "AI does not automatically improve or weaken thinking; the effect depends on how users evaluate outputs.",
+          "The risk is not only hallucination, but also over-trusting fluent reasoning.",
+          "The answer needs examples or evidence if it will be used in a formal workplace presentation."
         ]
+      },
+      {
+        id: "missing",
+        title: "What’s missing",
+        severity: "High attention",
+        explanation:
+          "The synthesis needs audience and usage context before Claude can make it more practical.",
+        bullets: [
+          "Who the presentation is for.",
+          "How the audience currently uses AI.",
+          "What behavior the synthesis should change.",
+          "Whether the goal is to inform, persuade, or recommend action."
+        ],
+        ctaLabel: "Add more context",
+        ctaMicrocopy:
+          "Claude can use these details to rewrite the synthesis for the actual audience and use case."
       }
     ],
-    actions: [
+    contextQuestions: [
       {
-        id: "makeAssumptionsVisible",
-        label: "Make assumptions visible",
-        mapsToLensCard: "assumptions",
-        mapsToLensCardLabel: "What Claude assumed",
-        requiresInput: false,
-        inputStateLabel: "No extra input needed",
-        followUpQuestions: []
+        id: "audience-usage",
+        question:
+          "Who is this synthesis meant for, and how are they using AI today?",
+        hardcodedResponse:
+          "It is for a workplace team of early-career analysts, PMs, and engineers who already use AI to draft documents, summarize research, debug code, and prepare recommendations. They are productive with AI, but they do not have a consistent way to judge whether the output is actually good."
       },
       {
-        id: "addMissingDetails",
-        label: "Add missing details",
-        mapsToLensCard: "missing",
-        mapsToLensCardLabel: "What’s missing",
-        requiresInput: true,
-        inputStateLabel: "Needs your input",
-        followUpQuestions: [
-          {
-            id: "audience",
-            question: "Who is this synthesis meant for?",
-            hardcodedResponse:
-              "It is for a workplace team of early-career professionals who already use AI tools for writing, research, coding, and decision-making."
-          },
-          {
-            id: "decision-context",
-            question:
-              "What should this synthesis help them understand or decide?",
-            hardcodedResponse:
-              "It should help them understand when AI helps them think better, when it makes them over-rely on polished outputs, and how to evaluate AI responses before using them in real work."
-          }
-        ]
-      },
-      {
-        id: "markCarefulParts",
-        label: "Mark parts to be careful with",
-        mapsToLensCard: "careful",
-        mapsToLensCardLabel: "What to be careful about",
-        requiresInput: false,
-        inputStateLabel: "No extra input needed",
-        followUpQuestions: []
+        id: "behavior-change",
+        question:
+          "What should this synthesis help them do differently?",
+        hardcodedResponse:
+          "It should help them stop treating polished AI responses as finished work. They should learn to check assumptions, missing context, evidence quality, and whether the answer fits the decision they are actually making."
       }
     ],
     finalOutputBuilder: buildResearchFinalOutput
   }
 };
 
-export const deriveRequiredQuestions = (flow, selectedActions) =>
-  selectedActions
-    .map((actionId) => flow.actions.find((action) => action.id === actionId))
-    .filter((action) => action && action.requiresInput)
-    .flatMap((action) => action.followUpQuestions);
-
-export const buildFinalOutput = (flow, selectedActions, answeredQuestions) =>
-  flow.finalOutputBuilder({ selectedActions, answeredQuestions });
+export const buildFinalOutput = (flow, answeredContextQuestions) =>
+  flow.finalOutputBuilder({ answeredContextQuestions });

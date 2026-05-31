@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import ClaudeHome from "./components/ClaudeHome";
 import ChatSimulation from "./components/ChatSimulation";
-import { buildFinalOutput, deriveRequiredQuestions, flows } from "./data/flows";
+import { buildFinalOutput, flows } from "./data/flows";
 
 function App() {
   const [selectedFlow, setSelectedFlow] = useState(null);
@@ -11,20 +11,22 @@ function App() {
   const [hasGeneratedOutput, setHasGeneratedOutput] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLensOpen, setIsLensOpen] = useState(false);
-  const [expandedLensCards, setExpandedLensCards] = useState([]);
-  const [selectedActions, setSelectedActions] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [requiredQuestions, setRequiredQuestions] = useState([]);
-  const [answeredQuestions, setAnsweredQuestions] = useState([]);
-  const [isQuestionFlowActive, setIsQuestionFlowActive] = useState(false);
+  const [expandedLensCards, setExpandedLensCards] = useState([
+    "assumptions",
+    "careful",
+    "missing"
+  ]);
+  const [isContextFlowActive, setIsContextFlowActive] = useState(false);
+  const [currentContextQuestionIndex, setCurrentContextQuestionIndex] = useState(0);
+  const [answeredContextQuestions, setAnsweredContextQuestions] = useState([]);
   const [isFollowupThinking, setIsFollowupThinking] = useState(false);
   const [showFinalOutput, setShowFinalOutput] = useState(false);
-  const [pendingFollowupStep, setPendingFollowupStep] = useState(null);
+  const [pendingContextStep, setPendingContextStep] = useState(null);
 
   const activeFlow = selectedFlow ? flows[selectedFlow] : null;
   const finalOutput =
     activeFlow && showFinalOutput
-      ? buildFinalOutput(activeFlow, selectedActions, answeredQuestions)
+      ? buildFinalOutput(activeFlow, answeredContextQuestions)
       : null;
 
   useEffect(() => {
@@ -38,67 +40,52 @@ function App() {
       setIsGenerating(false);
     }, 2200);
 
-    return () => {
-      window.clearTimeout(timer);
-    };
+    return () => window.clearTimeout(timer);
   }, [isGenerating]);
 
   useEffect(() => {
-    if (!pendingFollowupStep) {
+    if (!pendingContextStep) {
       return undefined;
     }
 
     const timer = window.setTimeout(() => {
-      if (pendingFollowupStep.type === "show-final") {
-        setCurrentQuestionIndex(0);
-        setRequiredQuestions([]);
-        setAnsweredQuestions([]);
-        setIsQuestionFlowActive(false);
-        setShowFinalOutput(true);
-      }
-
-      if (pendingFollowupStep.type === "start-question-flow") {
-        setRequiredQuestions(pendingFollowupStep.questions);
-        setAnsweredQuestions([]);
-        setCurrentQuestionIndex(0);
-        setIsQuestionFlowActive(true);
+      if (pendingContextStep.type === "start-context-flow") {
+        setAnsweredContextQuestions([]);
+        setCurrentContextQuestionIndex(0);
+        setIsContextFlowActive(true);
         setShowFinalOutput(false);
       }
 
-      if (pendingFollowupStep.type === "advance-question-flow") {
-        setAnsweredQuestions(pendingFollowupStep.answered);
-        setCurrentQuestionIndex(pendingFollowupStep.nextIndex);
-        setIsQuestionFlowActive(true);
+      if (pendingContextStep.type === "advance-context-flow") {
+        setAnsweredContextQuestions(pendingContextStep.answered);
+        setCurrentContextQuestionIndex(pendingContextStep.nextIndex);
+        setIsContextFlowActive(true);
         setShowFinalOutput(false);
       }
 
-      if (pendingFollowupStep.type === "finish-question-flow") {
-        setAnsweredQuestions(pendingFollowupStep.answered);
-        setCurrentQuestionIndex(pendingFollowupStep.nextIndex);
-        setIsQuestionFlowActive(false);
+      if (pendingContextStep.type === "finish-context-flow") {
+        setAnsweredContextQuestions(pendingContextStep.answered);
+        setCurrentContextQuestionIndex(pendingContextStep.nextIndex);
+        setIsContextFlowActive(false);
         setShowFinalOutput(true);
       }
 
       setIsFollowupThinking(false);
-      setPendingFollowupStep(null);
+      setPendingContextStep(null);
     }, 1400);
 
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [pendingFollowupStep]);
+    return () => window.clearTimeout(timer);
+  }, [pendingContextStep]);
 
   const resetReviewState = () => {
     setIsLensOpen(false);
-    setExpandedLensCards([]);
-    setSelectedActions([]);
-    setCurrentQuestionIndex(0);
-    setRequiredQuestions([]);
-    setAnsweredQuestions([]);
-    setIsQuestionFlowActive(false);
+    setExpandedLensCards(["assumptions", "careful", "missing"]);
+    setIsContextFlowActive(false);
+    setCurrentContextQuestionIndex(0);
+    setAnsweredContextQuestions([]);
     setIsFollowupThinking(false);
     setShowFinalOutput(false);
-    setPendingFollowupStep(null);
+    setPendingContextStep(null);
   };
 
   const handleOpenDemoPicker = () => {
@@ -129,7 +116,7 @@ function App() {
   const handleOpenLens = () => {
     setIsLensOpen(true);
     setExpandedLensCards((current) =>
-      current.length ? current : ["assumptions"]
+      current.length ? current : ["assumptions", "careful", "missing"]
     );
   };
 
@@ -145,70 +132,48 @@ function App() {
     );
   };
 
-  const handleToggleAction = (actionId) => {
-    setSelectedActions((current) =>
-      current.includes(actionId)
-        ? current.filter((id) => id !== actionId)
-        : [...current, actionId]
-    );
-    setCurrentQuestionIndex(0);
-    setRequiredQuestions([]);
-    setAnsweredQuestions([]);
-    setIsQuestionFlowActive(false);
-    setIsFollowupThinking(false);
-    setShowFinalOutput(false);
-    setPendingFollowupStep(null);
-  };
-
-  const handleContinueActions = () => {
-    if (!activeFlow || selectedActions.length === 0) {
+  const handleStartContextFlow = () => {
+    if (!activeFlow) {
       return;
     }
 
-    const derivedQuestions = deriveRequiredQuestions(activeFlow, selectedActions);
-
     setShowFinalOutput(false);
-    setIsQuestionFlowActive(false);
-    setAnsweredQuestions([]);
-    setCurrentQuestionIndex(0);
+    setAnsweredContextQuestions([]);
+    setCurrentContextQuestionIndex(0);
+    setIsContextFlowActive(false);
     setIsFollowupThinking(true);
+    setPendingContextStep({ type: "start-context-flow" });
+  };
 
-    if (derivedQuestions.length === 0) {
-      setPendingFollowupStep({ type: "show-final" });
+  const handleSendContextResponse = () => {
+    if (!activeFlow) {
       return;
     }
 
-    setPendingFollowupStep({
-      type: "start-question-flow",
-      questions: derivedQuestions
-    });
-  };
-
-  const handleSendQuestionResponse = () => {
-    const currentQuestion = requiredQuestions[currentQuestionIndex];
+    const currentQuestion = activeFlow.contextQuestions[currentContextQuestionIndex];
 
     if (!currentQuestion) {
       return;
     }
 
-    const nextAnswered = [...answeredQuestions, currentQuestion];
-    const nextIndex = currentQuestionIndex + 1;
+    const nextAnswered = [...answeredContextQuestions, currentQuestion];
+    const nextIndex = currentContextQuestionIndex + 1;
 
-    setAnsweredQuestions(nextAnswered);
-    setIsQuestionFlowActive(false);
+    setAnsweredContextQuestions(nextAnswered);
+    setIsContextFlowActive(false);
     setIsFollowupThinking(true);
 
-    if (nextIndex >= requiredQuestions.length) {
-      setPendingFollowupStep({
-        type: "finish-question-flow",
+    if (nextIndex >= activeFlow.contextQuestions.length) {
+      setPendingContextStep({
+        type: "finish-context-flow",
         answered: nextAnswered,
         nextIndex
       });
       return;
     }
 
-    setPendingFollowupStep({
-      type: "advance-question-flow",
+    setPendingContextStep({
+      type: "advance-context-flow",
       answered: nextAnswered,
       nextIndex
     });
@@ -232,20 +197,17 @@ function App() {
             isGenerating={isGenerating}
             isLensOpen={isLensOpen}
             expandedLensCards={expandedLensCards}
-            selectedActions={selectedActions}
-            currentQuestionIndex={currentQuestionIndex}
-            requiredQuestions={requiredQuestions}
-            answeredQuestions={answeredQuestions}
-            isQuestionFlowActive={isQuestionFlowActive}
+            isContextFlowActive={isContextFlowActive}
+            currentContextQuestionIndex={currentContextQuestionIndex}
+            answeredContextQuestions={answeredContextQuestions}
             isFollowupThinking={isFollowupThinking}
             showFinalOutput={showFinalOutput}
             finalOutput={finalOutput}
             onOpenLens={handleOpenLens}
             onCloseLens={handleCloseLens}
             onToggleLensCard={handleToggleLensCard}
-            onToggleAction={handleToggleAction}
-            onContinueActions={handleContinueActions}
-            onSendQuestionResponse={handleSendQuestionResponse}
+            onStartContextFlow={handleStartContextFlow}
+            onSendContextResponse={handleSendContextResponse}
             onComposerClick={handleOpenDemoPicker}
             onSendPrompt={handleSendPrompt}
           />

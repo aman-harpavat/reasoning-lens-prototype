@@ -1,24 +1,16 @@
 import LensModuleCard from "./LensModuleCard";
-import ActionPanel from "./ActionPanel";
 
 function ReasoningLensPanel({
   activeFlow,
   expandedLensCards,
-  selectedActions,
+  isContextFlowActive,
   onCloseLens,
   onToggleLensCard,
-  onToggleAction,
-  onContinueActions
+  onStartContextFlow
 }) {
   const getSeverityTone = (severity) => {
-    if (severity.startsWith("High")) {
-      return "is-high";
-    }
-
-    if (severity.startsWith("Medium")) {
-      return "is-medium";
-    }
-
+    if (severity.startsWith("High")) return "is-high";
+    if (severity.startsWith("Medium")) return "is-medium";
     return "is-low";
   };
 
@@ -50,18 +42,14 @@ function ReasoningLensPanel({
               card={card}
               expanded={isExpanded}
               severityTone={getSeverityTone(card.severity)}
+              showContextCta={card.id === "missing"}
+              isContextFlowActive={isContextFlowActive}
+              onStartContextFlow={onStartContextFlow}
               onToggle={() => onToggleLensCard(card.id)}
             />
           );
         })}
       </div>
-
-      <ActionPanel
-        actions={activeFlow.actions}
-        selectedActions={selectedActions}
-        onToggleAction={onToggleAction}
-        onContinueActions={onContinueActions}
-      />
     </aside>
   );
 }

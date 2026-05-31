@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-function RevisedOutput({ finalOutput, actions, selectedActions }) {
-  const selectedLabels = selectedActions
-    .map((actionId) => actions.find((action) => action.id === actionId)?.label)
-    .filter(Boolean)
-    .join(", ");
-
+function RevisedOutput({ finalOutput }) {
   const revealParagraphs = useMemo(
     () => [finalOutput.heading, ...finalOutput.paragraphs],
     [finalOutput]
@@ -29,39 +24,25 @@ function RevisedOutput({ finalOutput, actions, selectedActions }) {
           window.clearInterval(interval);
           return current;
         }
-
         return current + 2;
       });
     }, 40);
 
-    return () => {
-      window.clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [totalWords, finalOutput]);
 
   const visibleParagraphs = useMemo(() => {
     let remainingWords = visibleWordCount;
-
     return paragraphWords.map((words) => {
-      if (remainingWords <= 0) {
-        return "";
-      }
-
+      if (remainingWords <= 0) return "";
       const sliceCount = Math.min(words.length, remainingWords);
       remainingWords -= sliceCount;
       return words.slice(0, sliceCount).join(" ");
     });
   }, [paragraphWords, visibleWordCount]);
 
-  const hasFinishedReveal = visibleWordCount >= totalWords;
-
   return (
     <div className="revised-output">
-      <div className="revised-output-selected">
-        <span className="revised-output-selected-label">Selected improvements</span>
-        <span className="revised-output-selected-value">{selectedLabels}</span>
-      </div>
-
       <div className="message-row message-row-assistant message-row-followup">
         <div className="message-block">
           <div className="message-copy">
@@ -70,36 +51,6 @@ function RevisedOutput({ finalOutput, actions, selectedActions }) {
               <p key={`${index}-${finalOutput.heading}`}>{paragraph}</p>
             ))}
           </div>
-
-          {hasFinishedReveal && finalOutput.assumptionsSection ? (
-            <div className="final-output-section">
-              <h4 className="final-output-section-title">
-                {finalOutput.assumptionsSection.title}
-              </h4>
-              <ul className="final-output-section-list">
-                {finalOutput.assumptionsSection.bullets.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {hasFinishedReveal && finalOutput.cautionSection ? (
-            <div className="final-output-section">
-              <h4 className="final-output-section-title">
-                {finalOutput.cautionSection.title}
-              </h4>
-              <ul className="final-output-section-list">
-                {finalOutput.cautionSection.bullets.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {hasFinishedReveal ? (
-            <p className="reflection-prompt">{finalOutput.reflectionPrompt}</p>
-          ) : null}
         </div>
       </div>
     </div>
