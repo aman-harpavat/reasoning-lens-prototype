@@ -1,10 +1,14 @@
 import LensModuleCard from "./LensModuleCard";
+import ActionPanel from "./ActionPanel";
 
 function ReasoningLensPanel({
   activeFlow,
   expandedLensCards,
+  selectedActions,
   onCloseLens,
-  onToggleLensCard
+  onToggleLensCard,
+  onToggleAction,
+  onContinueActions
 }) {
   const getSeverityTone = (severity) => {
     if (severity.startsWith("High")) {
@@ -51,6 +55,13 @@ function ReasoningLensPanel({
           );
         })}
       </div>
+
+      <ActionPanel
+        actions={activeFlow.actions}
+        selectedActions={selectedActions}
+        onToggleAction={onToggleAction}
+        onContinueActions={onContinueActions}
+      />
     </aside>
   );
 }

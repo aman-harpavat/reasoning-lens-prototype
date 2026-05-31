@@ -19,11 +19,6 @@ function LensModuleCard({ card, expanded, severityTone, onToggle }) {
               <li key={bullet}>{bullet}</li>
             ))}
           </ul>
-
-          <div className="lens-module-card-question-block">
-            <p className="lens-module-card-question-label">Question</p>
-            <p className="lens-module-card-question">{card.question}</p>
-          </div>
         </div>
       ) : null}
     </div>

@@ -4,398 +4,366 @@
 
 ### What The Prototype Is
 
-Reasoning Lens is a hardcoded, single-page React/Vite prototype that simulates a native Claude feature for inspecting polished AI outputs before relying on them. The experience is centered on a Claude-like chat workspace where the user chooses one of two guided demo flows, sends a predefined prompt, reviews a prewritten Claude response, opens a right-side Reasoning Lens inspection panel, selects a gap-aligned improvement action, and sees a revised follow-up response in the same thread.
-
-The prototype is intended to communicate product intent, interaction flow, and visual fidelity. It should feel like a believable Claude workspace rather than a separate demo dashboard. All content, responses, evaluation modules, actions, and revised outputs are static and locally defined.
+Reasoning Lens is a hardcoded React/Vite prototype that simulates a native Claude inspection flow for high-stakes AI outputs. The user selects a guided demo, sends a predefined prompt, reviews Claude’s initial answer, opens a right-side Reasoning Lens panel, selects one or more improvement actions, optionally answers hardcoded follow-up questions, and then sees a polished final answer in the same thread.
 
 ### What The Prototype Is Not
 
-This prototype is not a real AI product implementation. It must not include:
+This prototype is not a live AI system. It does not include:
 
 - backend services
 - API calls
-- Claude integration
 - authentication
 - database storage
-- live generation
-- freeform prompt entry
-- file upload
-- scoring systems, trust meters, or verification badges
-- extra demo flows beyond interview and research
+- freeform prompt generation
+- manual prompt stitching
+- generic trust scores
 
-It is also not a generic chatbot. The interface only supports guided, predefined flows that demonstrate the Reasoning Lens concept reliably.
+Everything remains static, deterministic, and demo-safe.
 
 ## 2. User Flow
 
 ### Claude Home Screen
 
-The user lands on a Claude-style dark workspace with a fixed left sidebar, a large centered greeting, subtle supporting microcopy, and a composer positioned near the lower center of the main area. The screen should visually resemble the provided Claude reference screenshot as closely as practical while using the product-specific greeting: `What can I help you think through today?`
+The user lands on a Claude-style workspace with a fixed sidebar, centered greeting, and controlled composer.
 
 ### Composer-Based Guided Demo Selection
 
-The composer acts as the entry point for demo selection. The placeholder should read `Click to choose a guided demo`. Clicking the composer, or an adjacent `Try a guided demo` affordance, opens a compact demo picker near the composer. The picker offers exactly two options:
-
-- Interview Preparation
-- Research Synthesis
-
-This selection must happen in the main chat workspace, not in the sidebar.
+The user clicks the composer, chooses either `Interview Preparation` or `Research Synthesis`, and the corresponding hardcoded prompt is inserted.
 
 ### Predefined Prompt Insertion
 
-Selecting a demo option closes the picker, sets the chosen flow, and inserts that flow’s predefined prompt into the composer. A subtle workflow chip near the composer indicates the selected flow. The composer remains controlled and static; the user cannot type arbitrary prompt text.
+The selected flow appears in a subtle chip near the composer. The prompt itself is non-editable and static.
 
 ### Upward-Arrow Send Interaction
 
-Once a predefined prompt is loaded, the user clicks a Claude-style rounded-square send button with an upward arrow icon. This is the only functional composer submission control. Clicking it transitions the main area from the home state into the chat simulation state and reveals the hardcoded initial output for the selected flow.
+The user clicks the Claude-style upward-arrow button. A short `Thinking...` state appears, then Claude’s initial hardcoded response is revealed progressively in the thread.
 
 ### Initial Claude Response
 
-The chat thread shows the user prompt first, followed by the corresponding prewritten Claude response. The response should read as polished and credible, while the intentional weaknesses remain hidden from the interface at this stage.
+Claude’s first answer is intentionally polished but imperfect. The user sees only the answer, not the hidden reasoning weaknesses.
 
 ### Post-Response Action Row
 
-Below the Claude response, a native-feeling action row appears with:
-
-- Copy
-- Retry
-- Review with Reasoning Lens
-
-Only `Review with Reasoning Lens` is interactive. Supporting microcopy below or near the row explains that the user can inspect assumptions, uncertainty, missing context, and reasoning gaps before using the output.
+Below the answer, the user sees `Copy`, `Retry`, and `Review with Reasoning Lens`. Only `Review with Reasoning Lens` is functional.
 
 ### Reasoning Lens Right-Side Panel
 
-Clicking `Review with Reasoning Lens` opens the Reasoning Lens panel. On desktop, the layout shifts into a two-column inspection view with the conversation on the left and the panel on the right. On smaller screens, the panel stacks below the thread. The original Claude response remains visible while the panel is open.
+The panel opens beside the thread on desktop and stacks below on smaller screens. The original answer remains visible.
 
-### Expandable/Collapsible Evaluation Modules
+### Three Inspection Areas
 
-Inside the panel, the user sees six compact module cards:
+The panel contains exactly three expandable inspection cards:
 
-- Assumptions
-- Missing Context
-- Uncertainty
-- Reasoning Gaps
-- Alternative Perspectives
-- Human Judgment Needed
+- `What Claude assumed`
+- `What’s missing`
+- `What to be careful about`
 
-`Assumptions` is expanded by default. Users can expand or collapse any module. Multiple modules may remain open at the same time. Expanded content includes an explanation, 2 to 4 bullets, a severity label, and a user-facing question.
+`What Claude assumed` is expanded by default when the panel first opens. Each card contains:
 
-### Gap-Aligned Improvement Actions
+- title
+- severity
+- explanation
+- bullets
 
-Below the evaluation modules, an action section titled `Turn this review into a better answer` presents six improvement actions, each mapped to one module. Selecting an action highlights it and records the user’s chosen improvement path. For prototype simplicity, any action may reveal the same revised output state, but the selected action should remain visible so the UI still communicates intent and traceability.
+Cards no longer include question prompts.
 
-### Revised Output As Same-Thread Follow-Up
+### Multi-Select Improvement Actions
 
-After an action is selected, Claude displays a revised response as a follow-up assistant message in the same thread. The revised state also includes a `What changed` card and a final reflection prompt. This closing step reinforces that Reasoning Lens helps calibrate judgment and improve outputs, rather than scoring them.
+Below the inspection cards, the user can multi-select one or more action cards:
+
+- `Make assumptions visible`
+- `Add missing details`
+- `Mark parts to be careful with`
+
+Selections are toggle-based. The user can select one, multiple, or all three. `Continue` stays disabled until at least one action is selected.
+
+### Conditional Follow-Up Question Flow
+
+If the selected actions include only `makeAssumptionsVisible` and/or `markCarefulParts`, Claude skips questions and goes directly to the final output.
+
+If the selection includes `addMissingDetails`, the thread enters a question flow. Claude asks only the missing-detail questions for the active flow, one at a time. The user clicks the hardcoded response option to continue.
+
+### Final Revised Output
+
+After required questions are answered, Claude shows one complete polished follow-up answer in the same thread. The final output includes:
+
+- a revised answer heading
+- the full revised response
+- an optional assumptions section
+- an optional caution section
+- a `What changed` card based only on selected actions
+- a final reflection prompt
 
 ## 3. Component Architecture
 
 ### `App.jsx`
 
-Top-level composition root. Owns all shared prototype state, selects the active flow data, coordinates screen progression, and renders the global two-pane layout with the sidebar and main workspace.
+Top-level state owner. Manages flow selection, generation timing, Reasoning Lens visibility, multi-select action state, follow-up question state, and final output state.
 
 ### `Sidebar.jsx`
 
-Static Claude-style sidebar shell. Renders the brand label, top navigation pills, muted recent chat placeholders, and optional bottom account/status area. It provides atmosphere only and does not control demo selection.
+Static Claude-style visual shell. Provides context only.
 
 ### `ClaudeHome.jsx`
 
-Landing-state view for the main workspace before a response is generated. Renders the centered greeting, supporting microcopy, and composer area. Responsible for presenting the home-state version of the guided demo entry experience.
+Renders the greeting and home-state composer flow before any response is generated.
 
 ### `ChatSimulation.jsx`
 
-Primary chat workspace controller once a flow is selected. Coordinates the prompt display, message thread, composer state, post-response actions, Reasoning Lens panel placement, and revised-output insertion without introducing backend behavior.
+Coordinates the thread, composer, and right-side inspection panel after the user sends a prompt.
 
 ### `Composer.jsx`
 
-Controlled composer UI used on both the home state and chat simulation state. Displays the placeholder or predefined prompt, the selected flow chip, the `Try a guided demo` trigger, and the Claude-style upward-arrow send button. Does not allow unrestricted text entry.
+Controlled composer for guided-demo selection and send interaction. No freeform text input.
 
 ### `DemoPicker.jsx`
 
-Compact popover or inline option row anchored to the composer. Lists exactly two guided demo choices with a title and description. On selection, passes the chosen flow back up so `App.jsx` can load the corresponding prompt and close the picker.
+Renders the two guided demo options and notifies `App.jsx` when one is selected.
 
 ### `MessageThread.jsx`
 
-Renders the chat conversation area in order: user prompt, initial Claude response, and optionally the revised Claude response. Keeps the prototype feeling like a single Claude thread rather than multiple screens or modals.
+Renders:
+
+- user prompt
+- initial Claude response
+- post-response action row
+- follow-up question messages
+- hardcoded user responses
+- final revised output
+
+This keeps the entire flow inside one chat thread.
 
 ### `PostResponseActions.jsx`
 
-Displays the native-feeling action row below the initial Claude response. Includes static `Copy` and `Retry` controls plus the functional `Review with Reasoning Lens` control and its supporting explanatory text.
+Renders the native-feeling action row under the initial Claude answer.
 
 ### `ReasoningLensPanel.jsx`
 
-Container for the right-side inspection experience. Renders the panel header, subtitle, list of lens modules, and the gap-aligned action section. Handles desktop side-panel presentation versus stacked mobile fallback through layout classes and CSS.
+Renders the panel header, the three inspection cards, and the multi-select action area. Receives selection state and callbacks from `App.jsx`.
 
 ### `LensModuleCard.jsx`
 
-Reusable expandable card for each Reasoning Lens module. Displays the title, severity label, explanation, bullets, and question. Accepts `expanded` and `onToggle` props so the parent can manage multi-expand behavior.
+Reusable expandable inspection card for the three Lens areas.
 
 ### `ActionPanel.jsx`
 
-Renders the six improvement actions beneath the lens cards. Shows label, mapping context, `whatItDoes`, and `useWhen` copy. Handles selected-action highlighting and triggers the revised output state.
+Renders the three toggle-style improvement actions plus the `Continue` button. Reflects whether extra input is needed for each action.
 
 ### `RevisedOutput.jsx`
 
-Renders the follow-up Claude message plus the `What changed` summary and reflection prompt. This component is inserted into the same thread after an action is selected, preserving the feeling of a continuous conversation.
+Renders the final revised Claude output, optional assumptions/caution sections, dynamic `What changed` card, and reflection prompt.
 
 ## 4. State Model
 
-The prototype should use local React state only. The exact state variables are:
+The prototype uses local React state only.
 
 ### `selectedFlow`
 
 Type: `null | "interview" | "research"`
 
-Tracks which guided demo flow the user selected. Determines which content object is read from `src/data/flows.js`.
+Tracks the active guided demo flow.
 
 ### `isDemoPickerOpen`
 
 Type: `boolean`
 
-Controls visibility of the guided demo picker anchored to the composer.
+Controls the guided demo picker.
 
 ### `hasPromptLoaded`
 
 Type: `boolean`
 
-Indicates whether a predefined prompt has been inserted into the composer after flow selection.
+Tracks whether the selected prompt is loaded into the composer.
 
 ### `hasGeneratedOutput`
 
 Type: `boolean`
 
-Indicates whether the user has clicked the upward-arrow send button and the initial Claude response should be shown.
+Controls whether the initial Claude answer should be rendered.
 
 ### `isLensOpen`
 
 Type: `boolean`
 
-Controls whether the Reasoning Lens panel is visible.
+Controls the right-side Reasoning Lens panel.
 
 ### `expandedLensCards`
 
 Type: `string[]`
 
-Stores the ids of currently expanded lens cards. Default should be `["assumptions"]` when the lens first opens. Supports multiple expanded cards simultaneously.
+Stores which of the three inspection cards are expanded. Defaults to `["assumptions"]` when the panel first opens.
 
-### `selectedAction`
+### `selectedActions`
 
-Type: `null | "explicitAssumptions" | "missingContextPrompts" | "markUncertainty" | "strengthenReasoning" | "compareAngles" | "humanDecisionPoints"`
+Type: `string[]`
 
-Tracks which improvement action is selected so the chosen action can be highlighted before and during the revised output state.
+Stores the currently selected improvement actions. Replaces the older single-action model.
 
-### `showRevisedOutput`
+### `currentQuestionIndex`
+
+Type: `number`
+
+Tracks the active question in the follow-up flow.
+
+### `requiredQuestions`
+
+Type: `Array<Question>`
+
+Derived from the selected actions that require input. In this prototype, only `addMissingDetails` contributes questions.
+
+### `answeredQuestions`
+
+Type: `Array<Question>`
+
+Stores the hardcoded follow-up questions that the user has already accepted responses for.
+
+### `isQuestionFlowActive`
 
 Type: `boolean`
 
-Controls whether the revised Claude follow-up response, `What changed` card, and reflection prompt are rendered in the thread.
+Controls whether the thread is currently showing follow-up questions.
+
+### `showFinalOutput`
+
+Type: `boolean`
+
+Controls whether the deterministic polished final output appears in the thread.
 
 ### Transient UI State
 
-Implementation may also use a short-lived `isGenerating` UI flag to simulate Claude thinking for a couple of seconds before the hardcoded initial output appears. This is a presentation-only state and does not change the core static data model.
-
-### State Progression Notes
-
-- Initial state: `selectedFlow = null`, `isDemoPickerOpen = false`, `hasPromptLoaded = false`, `hasGeneratedOutput = false`, `isLensOpen = false`, `expandedLensCards = []`, `selectedAction = null`, `showRevisedOutput = false`
-- After demo selection: `selectedFlow` is set, `hasPromptLoaded = true`, `isDemoPickerOpen = false`
-- After send: `hasGeneratedOutput = true`
-- After opening lens: `isLensOpen = true`, `expandedLensCards = ["assumptions"]` if not yet initialized
-- After action selection: `selectedAction` is set and `showRevisedOutput = true`
+- `isGenerating`: short-lived visual state used to show `Thinking...` before the initial answer appears.
 
 ## 5. Data Model
 
-All content should live in `src/data/flows.js` as a single exported hardcoded object. The structure should support exactly two flows: interview and research.
+All flow content lives in `src/data/flows.js`.
 
 ```js
 export const flows = {
   interview: {
-    title: "Interview Preparation",
-    prompt: "...",
-    initialOutput: ["...", "..."],
-    hiddenWeaknesses: ["...", "..."],
+    id,
+    title,
+    prompt,
+    initialOutput,
+    hiddenWeaknesses,
     lensCards: [
       {
-        id: "assumptions",
-        title: "Assumptions",
-        severity: "Medium attention",
-        explanation: "...",
-        bullets: ["...", "..."],
-        question: "..."
+        id,
+        title,
+        severity,
+        explanation,
+        bullets
       }
     ],
     actions: [
       {
-        id: "explicitAssumptions",
-        label: "Make assumptions explicit",
-        mapsToLensCard: "assumptions",
-        whatItDoes: "...",
-        useWhen: "..."
+        id,
+        label,
+        mapsToLensCard,
+        mapsToLensCardLabel,
+        requiresInput,
+        inputStateLabel,
+        followUpQuestions: [
+          {
+            id,
+            question,
+            hardcodedResponse
+          }
+        ]
       }
     ],
-    revisedOutput: ["...", "..."],
-    whatChanged: ["...", "..."],
-    reflectionPrompt: "..."
-  },
-  research: {
-    title: "Research Synthesis",
-    prompt: "...",
-    initialOutput: ["...", "..."],
-    hiddenWeaknesses: ["...", "..."],
-    lensCards: [
-      {
-        id: "assumptions",
-        title: "Assumptions",
-        severity: "Medium attention",
-        explanation: "...",
-        bullets: ["...", "..."],
-        question: "..."
-      }
-    ],
-    actions: [
-      {
-        id: "explicitAssumptions",
-        label: "Make assumptions explicit",
-        mapsToLensCard: "assumptions",
-        whatItDoes: "...",
-        useWhen: "..."
-      }
-    ],
-    revisedOutput: ["...", "..."],
-    whatChanged: ["...", "..."],
-    reflectionPrompt: "..."
+    finalOutputBuilder
   }
 };
+
+export const deriveRequiredQuestions = (flow, selectedActions) => ...
+export const buildFinalOutput = (flow, selectedActions, answeredQuestions) => ...
 ```
 
-### Interview Flow
+### Flow Content
 
-The interview flow contains the predefined PM interview prompt, the polished-but-generic initial answer, hidden weaknesses related to specificity and credibility, six interview-specific lens cards, six improvement actions, the revised interview answer, the interview-specific `What changed` bullets, and the final reflection prompt about replacing the generic project reference with a real example.
+Each flow defines:
 
-### Research Flow
+- exactly 3 inspection cards
+- exactly 3 aligned improvement actions
+- flow-specific follow-up questions for `addMissingDetails`
+- a deterministic final-output builder
 
-The research flow contains the predefined research synthesis prompt, the balanced-but-generic initial answer, hidden weaknesses related to evidence and nuance, six research-specific lens cards, six improvement actions, the revised synthesis answer, the research-specific `What changed` bullets, and the final reflection prompt about adding evidence or examples for the target audience and decision context.
+### Final Output Builder
 
-### Field Intent
+The builder does not brute-force all 7 action combinations. Instead it uses:
 
-- `prompt`: the predefined user prompt inserted into the composer
-- `initialOutput`: the hardcoded Claude response shown after send
-- `hiddenWeaknesses`: non-rendered reference content that explains why the initial output is imperfect
-- `lensCards`: the six evaluation modules shown in the Reasoning Lens panel
-- `actions`: the six gap-aligned improvement choices shown below the lens cards
-- `revisedOutput`: the follow-up Claude response shown after action selection
-- `whatChanged`: concise bullets explaining how the revised answer improved
-- `reflectionPrompt`: final calibration prompt shown after the revised answer
+- base paragraphs per flow
+- a conditional paragraph variant for `addMissingDetails`
+- an optional assumptions section for `makeAssumptionsVisible`
+- an optional caution section for `markCarefulParts`
+- a dynamic `What changed` list filtered by `selectedActions`
 
 ## 6. Styling Architecture
 
-The prototype should use plain CSS only. No Tailwind should be introduced. Styling should be organized around a small set of global CSS variables and layout/component class files that keep the visual system consistent with the Claude reference.
+The app continues to use plain CSS, the existing Claude-style dark theme, and the shared global type/spacing tokens. The new Stage 7 flow adds:
 
-### CSS Approach
+- toggle-style action cards
+- a disabled/enabled `Continue` button
+- in-thread follow-up question cards
+- polished final output sections
 
-- plain CSS files imported into the React app
-- global tokens defined once in `:root`
-- layout-oriented classes for sidebar, workspace, thread, panel, and composer
-- component-specific classes kept lightweight and predictable
-
-### Global CSS Variables
-
-The exact color tokens from `spec.md` should be used:
-
-```css
-:root {
-  --bg-main: #1b1b1a;
-  --bg-sidebar: #252523;
-  --bg-card: #2d2d2b;
-  --bg-card-hover: #343432;
-  --bg-input: #30302e;
-  --border-subtle: #454542;
-  --border-strong: #565650;
-
-  --text-primary: #d6d1c7;
-  --text-secondary: #aaa59c;
-  --text-muted: #7f7b73;
-
-  --accent: #d97757;
-  --accent-hover: #e18668;
-  --accent-soft: rgba(217, 119, 87, 0.14);
-
-  --button-bg: #3a3a37;
-  --button-bg-hover: #464641;
-  --sidebar-active: #3b3b38;
-}
-```
-
-In addition to color tokens, the prototype should use a small shared typography and spacing scale rather than many one-off values. Keep the interface mostly within 3 to 4 font sizes and 3 to 4 spacing steps so the Claude-like UI feels quieter and more consistent.
-
-### Claude-Style Dark Theme
-
-The interface should stay quiet, minimal, and warm. The main background uses `--bg-main`, the sidebar uses `--bg-sidebar`, cards and the lens panel use `--bg-card`, and the composer uses `--bg-input`. Borders should be subtle and rounded, with no harsh drop shadows or bright dashboard colors. The accent is reserved for the send button and subtle emphasis states such as the lens CTA treatment and severity chips.
-
-### Typography
-
-System sans-serif should be used for the main interface. The large greeting may use a serif-like treatment to approximate Claude’s visual tone. Text sizing should follow the spec’s readable desktop-first scale, with body text at 15px to 16px and the hero greeting in the 40px to 52px range.
-
-### Layout Strategy
-
-The app is desktop-first:
-
-- fixed left sidebar around 300px wide
-- main workspace offset to account for sidebar width
-- centered conversation column with generous whitespace
-- Reasoning Lens as a desktop right-side panel within a two-column content area when open
-
-### Responsive Fallback For Smaller Screens
-
-On narrower widths, the sidebar can compress or remain fixed depending on available space, but the priority is maintaining a readable thread and composer. The Reasoning Lens panel should stack below the conversation rather than forcing an unusably narrow side-by-side layout. The composer and action controls should remain tappable, but desktop visual fidelity remains the primary target.
+No Tailwind, API-driven UI, or extra design systems are introduced.
 
 ## 7. Implementation Stages
 
 ### Stage 1: Project Setup And File Structure
 
-Confirm the Vite React structure, create the planned `src/components`, `src/data`, and `src/styles` folders, and add `documents/architecture.md`. No app behavior beyond scaffolding should be introduced here.
+Scaffold Vite/React structure and placeholder files.
 
 ### Stage 2: Claude-Style Sidebar And Base Layout
 
-Build the static app shell with `App.jsx`, `Sidebar.jsx`, and the main workspace container. Match the reference screenshot’s proportions, spacing, dark palette, and quiet overall composition before layering in flow logic.
+Build the static app shell and base theme.
 
 ### Stage 3: Claude Home Screen And Composer Demo Picker
 
-Implement `ClaudeHome.jsx`, `Composer.jsx`, and `DemoPicker.jsx` with the centered greeting, supporting microcopy, composer placeholder, guided demo selection popover, predefined prompt loading, and the upward-arrow send affordance. Keep the composer controlled and non-freeform.
+Implement guided demo selection and prompt loading.
 
 ### Stage 4: Hardcoded Chat Flow Rendering
 
-Add `ChatSimulation.jsx` and `MessageThread.jsx` to render the selected prompt and hardcoded initial Claude response for both flows. Ensure the thread reads like a real Claude conversation rather than a stepper or slideshow.
+Implement send behavior, `Thinking...`, and initial Claude outputs.
 
 ### Stage 5: Post-Response Action Row And Reasoning Lens Panel
 
-Implement `PostResponseActions.jsx` and `ReasoningLensPanel.jsx`. Add the action row under the initial response and wire the `Review with Reasoning Lens` action to open the right-side inspection panel while preserving visibility of the original response.
+Add the review CTA and right-side panel shell.
 
 ### Stage 6: Expandable Lens Modules
 
-Implement `LensModuleCard.jsx` and the `expandedLensCards` interaction model. Ensure `Assumptions` is expanded by default, multiple cards can stay open, and the modules feel lightweight and native instead of dashboard-heavy.
+Make inspection cards expandable and collapsible.
 
-### Stage 7: Gap-Aligned Action Panel And Revised Output
+### Stage 7: Simplified Three-Area Improvement Flow
 
-Implement `ActionPanel.jsx` and `RevisedOutput.jsx`. Render the six mapped improvement actions, selected-action highlighting, and the revised Claude follow-up response with `What changed` and the reflection prompt.
+Refactor the Lens to 3 inspection areas, add multi-select actions, introduce conditional follow-up questions, and render deterministic polished final output in the thread.
 
 ### Stage 8: Visual Polish And Vercel Build Check
 
-Refine spacing, typography, borders, hover states, and desktop resemblance to the Claude screenshot. Verify the static build with `npm run build` and make any final CSS adjustments needed for a clean Vercel deployment.
+Final polish, responsive checks, and build verification.
 
 ## 8. Testing Checklist
 
-Manual verification should cover:
-
-- Interview flow loads the correct prompt, initial output, lens content, actions, and revised output
-- Research flow loads the correct prompt, initial output, lens content, actions, and revised output
-- Composer-based selection is the only way to choose a demo flow
-- Upward-arrow send button is the control that reveals the initial hardcoded output
-- Reasoning Lens opens and closes correctly from the post-response action row
-- `Assumptions` is expanded by default when Reasoning Lens first opens
-- Lens modules can each be expanded and collapsed, with multiple allowed open
-- Gap-aligned actions visually map to the six module categories and selection highlighting works
-- Revised output appears as a same-thread follow-up Claude message
-- No freeform prompt input is available anywhere in the composer
-- No sidebar demo navigation exists for Interview Preparation or Research Synthesis
-- Vercel build succeeds via `npm run build`
+- Only 3 Reasoning Lens areas are shown
+- Lens area titles are simple and easy to understand
+- Lens cards do not show questions
+- User can select one action
+- User can select multiple actions
+- User can deselect actions
+- `Continue` is disabled until at least one action is selected
+- Selecting only `makeAssumptionsVisible` directly shows final output
+- Selecting only `markCarefulParts` directly shows final output
+- Selecting `addMissingDetails` asks only missing-detail questions
+- Selecting `makeAssumptionsVisible` and `markCarefulParts` directly shows final output with both improvements
+- Selecting `addMissingDetails` with either or both other actions asks only missing-detail questions and includes all selected improvements in final output
+- All 7 non-empty action combinations work through the same data-driven logic
+- Final output is one polished answer, not disconnected snippets
+- The `What changed` card only includes selected improvements
+- Both interview and research flows work
+- The app still matches the Claude-native visual direction
+- `npm run build` succeeds
 
 ## 9. Architecture Change Log
+
+- Reduced Reasoning Lens from six areas to three clearer areas and updated improvement actions to support multi-select, conditional follow-up questions, and deterministic polished final output generation.

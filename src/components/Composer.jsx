@@ -4,6 +4,8 @@ import DemoPicker from "./DemoPicker";
 function Composer({
   activeFlow,
   hasPromptLoaded,
+  customPromptText,
+  isSendEnabled,
   isDemoPickerOpen,
   onComposerClick,
   onSelectFlow,
@@ -13,9 +15,10 @@ function Composer({
   showFlowChip = true,
   placeholderText = "Click to choose a guided demo"
 }) {
-  const promptText = hasPromptLoaded
+  const promptText = customPromptText || (hasPromptLoaded
     ? activeFlow?.prompt
-    : placeholderText;
+    : placeholderText);
+  const canSend = typeof isSendEnabled === "boolean" ? isSendEnabled : hasPromptLoaded;
 
   return (
     <div className="composer-shell">
@@ -30,14 +33,14 @@ function Composer({
 
         <button
           className={`composer-surface composer-surface-button${
-            hasPromptLoaded ? " has-prompt" : ""
+            canSend ? " has-prompt" : ""
           }`}
           type="button"
-          onClick={hasPromptLoaded ? undefined : onComposerClick}
+          onClick={canSend ? undefined : onComposerClick}
         >
           <p
             className={`composer-placeholder${
-              hasPromptLoaded ? " has-prompt" : ""
+              canSend ? " has-prompt" : ""
             }${
               !promptText ? " is-empty" : ""
             }`}
@@ -51,10 +54,10 @@ function Composer({
               <span className="composer-model">Claude</span>
               <span className="composer-meta-separator" />
               <button
-                className={`composer-send${hasPromptLoaded ? "" : " is-disabled"}`}
+                className={`composer-send${canSend ? "" : " is-disabled"}`}
                 type="button"
-                onClick={hasPromptLoaded ? onSendPrompt : undefined}
-                disabled={!hasPromptLoaded}
+                onClick={canSend ? onSendPrompt : undefined}
+                disabled={!canSend}
                 aria-label="Send prompt"
               >
                 <ArrowUp size={18} strokeWidth={2.4} />
