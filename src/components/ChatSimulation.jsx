@@ -9,6 +9,7 @@ function ChatSimulation({
   expandedLensCards,
   onOpenLens,
   onCloseLens,
+  onToggleLensCard,
   onComposerClick,
   onSendPrompt
 }) {
@@ -27,6 +28,7 @@ function ChatSimulation({
             activeFlow={activeFlow}
             expandedLensCards={expandedLensCards}
             onCloseLens={onCloseLens}
+            onToggleLensCard={onToggleLensCard}
           />
         ) : null}
       </div>

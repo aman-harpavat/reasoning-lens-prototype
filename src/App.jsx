@@ -68,6 +68,14 @@ function App() {
     setIsLensOpen(false);
   };
 
+  const handleToggleLensCard = (cardId) => {
+    setExpandedLensCards((current) =>
+      current.includes(cardId)
+        ? current.filter((id) => id !== cardId)
+        : [...current, cardId]
+    );
+  };
+
   return (
     <div className="app-shell">
       <Sidebar />
@@ -88,6 +96,7 @@ function App() {
             expandedLensCards={expandedLensCards}
             onOpenLens={handleOpenLens}
             onCloseLens={handleCloseLens}
+            onToggleLensCard={handleToggleLensCard}
             onComposerClick={handleOpenDemoPicker}
             onSendPrompt={handleSendPrompt}
           />

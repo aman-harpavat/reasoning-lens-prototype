@@ -1,4 +1,11 @@
-function ReasoningLensPanel({ activeFlow, expandedLensCards, onCloseLens }) {
+import LensModuleCard from "./LensModuleCard";
+
+function ReasoningLensPanel({
+  activeFlow,
+  expandedLensCards,
+  onCloseLens,
+  onToggleLensCard
+}) {
   const getSeverityTone = (severity) => {
     if (severity.startsWith("High")) {
       return "is-high";
@@ -31,27 +38,16 @@ function ReasoningLensPanel({ activeFlow, expandedLensCards, onCloseLens }) {
 
       <div className="lens-panel-modules">
         {activeFlow.lensCards.map((card) => {
-          const isDefaultOpen = expandedLensCards.includes(card.id);
+          const isExpanded = expandedLensCards.includes(card.id);
 
           return (
-            <div
+            <LensModuleCard
               key={card.id}
-              className={`lens-module-preview${
-                isDefaultOpen ? " is-default-open" : ""
-              }`}
-            >
-              <div className="lens-module-preview-top">
-                <span className="lens-module-preview-title">{card.title}</span>
-                <span
-                  className={`lens-module-preview-severity ${getSeverityTone(
-                    card.severity
-                  )}`}
-                >
-                  {card.severity}
-                </span>
-              </div>
-              <p className="lens-module-preview-copy">{card.explanation}</p>
-            </div>
+              card={card}
+              expanded={isExpanded}
+              severityTone={getSeverityTone(card.severity)}
+              onToggle={() => onToggleLensCard(card.id)}
+            />
           );
         })}
       </div>
