@@ -284,9 +284,11 @@ Final polish and build verification.
 - No final reflection prompt is shown
 - Final improved answer appears only after context questions are answered
 - Final improved answer is polished and complete
+- After the final improved answer appears, the chat view becomes read-only and the composer becomes the only restart path
 - UI still matches Claude visual direction
 - `npm run build` passes
 
 ## 9. Architecture Change Log
 
 - Simplified Reasoning Lens from selectable improvement actions to an inspection-first flow: assumptions and cautions are shown directly, only missing context triggers follow-up questions, and the final rewritten answer no longer includes a What Changed block or final reflection prompt.
+- After a demo completes, the chat locks into a read-only state and the composer resets the prototype back to the guided demo picker.

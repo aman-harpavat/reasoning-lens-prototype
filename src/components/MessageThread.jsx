@@ -29,6 +29,7 @@ function MessageThread({
   activeFlow,
   isGenerating,
   isLensOpen,
+  isDemoComplete,
   currentContextQuestionIndex,
   answeredContextQuestions,
   isContextFlowActive,
@@ -101,7 +102,7 @@ function MessageThread({
                   ))}
                 </div>
 
-                {visibleWordCount >= totalWords ? (
+                {visibleWordCount >= totalWords && !isDemoComplete ? (
                   <PostResponseActions isLensOpen={isLensOpen} onOpenLens={onOpenLens} />
                 ) : null}
 

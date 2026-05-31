@@ -7,6 +7,7 @@ function ChatSimulation({
   activeFlow,
   isGenerating,
   isLensOpen,
+  isDemoComplete,
   isContextFlowActive,
   currentContextQuestionIndex,
   answeredContextQuestions,
@@ -17,6 +18,7 @@ function ChatSimulation({
   onCloseLens,
   onStartContextFlow,
   onSendContextResponse,
+  onResetToDemoPicker,
   onComposerClick,
   onSendPrompt
 }) {
@@ -42,12 +44,15 @@ function ChatSimulation({
   }, [currentQuestion, isContextFlowActive, isFollowupThinking]);
 
   return (
-    <section className="workspace-stage workspace-stage-chat">
+    <section
+      className={`workspace-stage workspace-stage-chat${isDemoComplete ? " is-demo-complete" : ""}`}
+    >
       <div className={`chat-layout${isLensOpen ? " is-lens-open" : ""}`}>
         <MessageThread
           activeFlow={activeFlow}
           isGenerating={isGenerating}
           isLensOpen={isLensOpen}
+          isDemoComplete={isDemoComplete}
           currentContextQuestionIndex={currentContextQuestionIndex}
           answeredContextQuestions={answeredContextQuestions}
           isContextFlowActive={isContextFlowActive}
@@ -69,19 +74,35 @@ function ChatSimulation({
 
       <Composer
         activeFlow={activeFlow}
-        hasPromptLoaded={Boolean(
-          isContextFlowActive && currentQuestion && !isFollowupThinking && isQuestionReadyForResponse
-        )}
+        hasPromptLoaded={
+          isDemoComplete
+            ? false
+            : Boolean(
+                isContextFlowActive &&
+                  currentQuestion &&
+                  !isFollowupThinking &&
+                  isQuestionReadyForResponse
+              )
+        }
         customPromptText={
-          isContextFlowActive && currentQuestion && isQuestionReadyForResponse
+          isDemoComplete
+            ? "Click to see another demo"
+            : isContextFlowActive && currentQuestion && isQuestionReadyForResponse
             ? currentQuestion.hardcodedResponse
             : ""
         }
-        isSendEnabled={Boolean(
-          isContextFlowActive && currentQuestion && isQuestionReadyForResponse && !isFollowupThinking
-        )}
+        isSendEnabled={
+          isDemoComplete
+            ? false
+            : Boolean(
+                isContextFlowActive &&
+                  currentQuestion &&
+                  isQuestionReadyForResponse &&
+                  !isFollowupThinking
+              )
+        }
         isDemoPickerOpen={false}
-        onComposerClick={onComposerClick}
+        onComposerClick={isDemoComplete ? onResetToDemoPicker : onComposerClick}
         onSelectFlow={() => {}}
         onSendPrompt={isContextFlowActive ? onSendContextResponse : onSendPrompt}
         helperText="Guided prototype — response is preloaded for demo reliability."

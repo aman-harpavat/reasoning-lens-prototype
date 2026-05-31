@@ -341,6 +341,10 @@
   align-items: flex-start;
 }
 
+.workspace-stage-chat.is-demo-complete .chat-layout {
+  pointer-events: none;
+}
+
 .message-thread {
   width: 100%;
   display: flex;
@@ -710,6 +714,10 @@
 
 .composer-surface-button.has-prompt {
   cursor: default;
+}
+
+.workspace-stage-chat.is-demo-complete .composer-surface-button {
+  cursor: pointer;
 }
 
 .composer-placeholder {

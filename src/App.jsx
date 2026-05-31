@@ -23,6 +23,7 @@ function App() {
     activeFlow && showFinalOutput
       ? buildFinalOutput(activeFlow, answeredContextQuestions)
       : null;
+  const isDemoComplete = Boolean(showFinalOutput && activeFlow);
 
   useEffect(() => {
     if (!isGenerating) {
@@ -115,6 +116,15 @@ function App() {
     setIsLensOpen(false);
   };
 
+  const handleResetToDemoPicker = () => {
+    setSelectedFlow(null);
+    setHasPromptLoaded(false);
+    setHasGeneratedOutput(false);
+    setIsGenerating(false);
+    setIsDemoPickerOpen(true);
+    resetReviewState();
+  };
+
   const handleStartContextFlow = () => {
     if (!activeFlow) {
       return;
@@ -179,6 +189,7 @@ function App() {
             activeFlow={activeFlow}
             isGenerating={isGenerating}
             isLensOpen={isLensOpen}
+            isDemoComplete={isDemoComplete}
             isContextFlowActive={isContextFlowActive}
             currentContextQuestionIndex={currentContextQuestionIndex}
             answeredContextQuestions={answeredContextQuestions}
@@ -189,6 +200,7 @@ function App() {
             onCloseLens={handleCloseLens}
             onStartContextFlow={handleStartContextFlow}
             onSendContextResponse={handleSendContextResponse}
+            onResetToDemoPicker={handleResetToDemoPicker}
             onComposerClick={handleOpenDemoPicker}
             onSendPrompt={handleSendPrompt}
           />
