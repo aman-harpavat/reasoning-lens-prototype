@@ -1,4 +1,16 @@
 function ReasoningLensPanel({ activeFlow, expandedLensCards, onCloseLens }) {
+  const getSeverityTone = (severity) => {
+    if (severity.startsWith("High")) {
+      return "is-high";
+    }
+
+    if (severity.startsWith("Medium")) {
+      return "is-medium";
+    }
+
+    return "is-low";
+  };
+
   return (
     <aside className="lens-panel">
       <div className="lens-panel-header">
@@ -30,7 +42,11 @@ function ReasoningLensPanel({ activeFlow, expandedLensCards, onCloseLens }) {
             >
               <div className="lens-module-preview-top">
                 <span className="lens-module-preview-title">{card.title}</span>
-                <span className="lens-module-preview-severity">
+                <span
+                  className={`lens-module-preview-severity ${getSeverityTone(
+                    card.severity
+                  )}`}
+                >
                   {card.severity}
                 </span>
               </div>

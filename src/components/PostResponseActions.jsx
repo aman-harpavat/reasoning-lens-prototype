@@ -21,7 +21,7 @@ function PostResponseActions({ isLensOpen, onOpenLens }) {
 
       <p className="post-actions-note">
         <span className="post-actions-note-label">Note:</span> Use this before
-        relying on the output for a real decision, interview, or work product.
+        relying on the output for critical tasks.
       </p>
     </div>
   );
