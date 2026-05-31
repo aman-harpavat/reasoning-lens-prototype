@@ -132,18 +132,6 @@ Type: `boolean`
 
 Type: `boolean`
 
-### `expandedLensCards`
-
-Type: `string[]`
-
-Default:
-
-```js
-["assumptions", "careful", "missing"]
-```
-
-This is now effectively a fixed default-open set rather than an actively user-managed collapse state.
-
 ### `isContextFlowActive`
 
 Type: `boolean`
@@ -172,6 +160,7 @@ Becomes `true` only after all context questions are answered.
 
 - `isGenerating`
 - `isFollowupThinking`
+- `pendingContextStep`
 
 These drive Claude-style `Thinking...` delays.
 
@@ -252,7 +241,7 @@ Review CTA and right-side Lens panel shell.
 
 ### Stage 6
 
-Expandable inspection cards.
+Default-open inspection cards with progressive reveal.
 
 ### Stage 7
 

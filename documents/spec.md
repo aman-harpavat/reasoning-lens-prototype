@@ -302,17 +302,13 @@ Required state:
 - `hasPromptLoaded`
 - `hasGeneratedOutput`
 - `isLensOpen`
-- `expandedLensCards`
 - `isContextFlowActive`
 - `currentContextQuestionIndex`
 - `answeredContextQuestions`
 - `showFinalOutput`
-
-Default expanded cards:
-
-```js
-["assumptions", "careful", "missing"]
-```
+- `isGenerating`
+- `isFollowupThinking`
+- `pendingContextStep`
 
 Behavior:
 
@@ -325,6 +321,10 @@ Behavior:
   - `isContextFlowActive = false`
   - `showFinalOutput = true`
   - final improved answer is rendered
+- After the final improved answer appears:
+  - the chat becomes read-only
+  - the composer becomes the only restart path
+  - clicking the composer resets the app back to the guided demo picker state
 
 ## 7. Acceptance Criteria
 
@@ -344,8 +344,9 @@ Behavior:
 11. Final reflection prompts are removed.
 12. Final improved answer appears only after context questions are answered.
 13. Final improved answer is polished and complete.
-14. UI still matches Claude visual design.
-15. `npm run build` passes.
+14. After the final improved answer appears, the chat becomes read-only and the composer resets the user back to the guided demo picker.
+15. UI still matches Claude visual design.
+16. `npm run build` passes.
 
 ## 8. Implementation Notes
 
@@ -354,3 +355,4 @@ Behavior:
 - do not add backend or live AI
 - only missing context should trigger follow-up questions
 - the final improved answer should be shown only after context questions are answered
+- after a completed demo, the composer should act as the restart entry point for another guided demo
